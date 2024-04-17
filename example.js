@@ -137,15 +137,7 @@ function initFlashlight(camera) {
     camera.add(flashlightGeometry);
 }
 
-//add slenderman model
-function addSlenderman() {
-	var loader = new THREE.GLTFLoader();
-	loader.load('slender_1.glb', function (gltf) {
-		var slenderman = gltf.scene;
-		slenderman.scale.set(0.1, 0.1, 0.1);
-		slenderman.position.set(0, 0, -10);
-		scene.add(slenderman);
-	});
+
 
 function animate() {
   
