@@ -65,6 +65,25 @@ var Harvest = (function () {
 				objects.push(floorMesh);
 				scene.add(floorMesh);
 			});
+			//make fog in the distance
+			scene.fog = new THREE.Fog(0x444444, 0, 500);
+
+			var ambientLight = new THREE.AmbientLight(0x101020); // Adjust color and intensity as needed
+			scene.add(ambientLight);
+			var directionalLight = new THREE.DirectionalLight(0x444444, 0.5); // Adjust color and intensity as needed
+			directionalLight.position.set(0, 1, 0); // Adjust position to simulate moonlight direction
+			scene.add(directionalLight);
+			var material = new THREE.MeshStandardMaterial({
+				color: 0xffffff,
+				emissive: 0x0044ff, // Adjust emissive color as needed
+				emissiveIntensity: 0.2 // Adjust intensity as needed
+			});
+
+			//change the color of the sky
+			scene.background = new THREE.Color(0x444444);
+			
+
+
 			  
 			// Trees
 			var treeTrunkGeometry = new THREE.CylinderGeometry(10, 10, 100, 32);
