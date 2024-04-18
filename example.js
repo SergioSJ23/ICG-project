@@ -44,8 +44,8 @@ var Harvest = (function () {
 
 	
 			// Floor
-			var floorWidth = 20000;
-			var floorHeight = 20000;
+			var floorWidth = 5000;
+			var floorHeight = 5000;
 	
 			var textureLoader = new THREE.TextureLoader();
 			textureLoader.load('ground.jpg', function (texture) {
@@ -71,7 +71,7 @@ var Harvest = (function () {
 			var trunkTexture = new THREE.TextureLoader().load("trunk_texture.jpg");
 			var trunkMaterial = new THREE.MeshLambertMaterial({ map: trunkTexture });
 
-			for (var i = 0; i < 80; i++) {
+			for (var i = 0; i < 20; i++) {
 				var treeTrunk = new THREE.Mesh(treeTrunkGeometry, trunkMaterial);
 
 				// Randomize foliage size
@@ -97,7 +97,7 @@ var Harvest = (function () {
 
   
   
-			camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 9000 );
+			camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 1000 );
 			camera2  = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 10);
 			camera2.position.z = camera.position.z - 1;
 			camera2.position.y = camera.position.y;
