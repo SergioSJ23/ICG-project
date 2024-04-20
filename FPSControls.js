@@ -4,6 +4,7 @@
 
 THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, worldObjects ) {
 
+	var footstepSound = new Audio('footsteps.mp3');
 	var scope = this;
 
 	scope.worldObjects = worldObjects;
@@ -163,14 +164,14 @@ THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, w
 	scope.baseHeight = 0; // The minimum plane height
 	scope.mass = mass || 100;
 	scope.originalMass = mass;
-	scope.walkingSpeed = 3000; // Higher = slower
-	scope.speed = 900; // Movement speed
+	scope.runingSpeed = 500; // Higher = slower
+	scope.speed = 550; // Movement speed
 	scope.jumpFactor = 90; // Jump height
 	scope.velocity = new THREE.Vector3(1, 1, 1);
 
 	scope.jumps = 0;
 	scope.firstJump = true;
-	scope.walking = false;
+	scope.runing = false;
 
 	// Crouched
 	scope.crouching = false;
@@ -191,8 +192,8 @@ THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, w
 		scope.crouching = boolean;
 	};
 
-	scope.walk = function(boolean) {
-		scope.walking = boolean;
+	scope.run = function(boolean) {
+		scope.runing = boolean;
 	};
 
 	// So you can update the world objects when they change
@@ -206,15 +207,21 @@ THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, w
 
 		scope.movements.unlock();
 
-		// Check change and if Walking?
-		scope.delta = (scope.walking) ? ( scope.time - scope.prevTime ) / scope.walkingSpeed : ( scope.time - scope.prevTime ) / scope.speed;
+		if (scope.movements.forward || scope.movements.backward || scope.movements.left || scope.movements.right) {
+			footstepSound.play();
+		}else {
+			footstepSound.pause();
+		}
+
+		// Check change and if runing?
+		scope.delta = (scope.runing) ? ( scope.time - scope.prevTime ) / scope.runingSpeed : ( scope.time - scope.prevTime ) / scope.speed;
 		var validDelta = isNaN(scope.delta) === false;
 		if (validDelta) {
 
 			// Velocities
 			scope.velocity.x -= scope.velocity.x * 8.0 * scope.delta; // Left and right
 			scope.velocity.z -= scope.velocity.z * 8.0 * scope.delta; // Forward and back
-			scope.velocity.y -= (scope.walking) ?  9.8 * scope.mass * scope.delta : 5.5 * scope.mass * scope.delta;  // Up and Down
+			scope.velocity.y -= (scope.runing) ?  9.8 * scope.mass * scope.delta : 5.5 * scope.mass * scope.delta;  // Up and Down
 
 			scope.camDir = scope.getPlayer().getWorldDirection().negate(); //
 			scope.playersPosition = scope.getPlayer().position.clone();
@@ -241,7 +248,7 @@ THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, w
 				// }
 
 			} else {
-				this.walking = false;
+				this.runing = false;
 			}
 
 			// Crouched
@@ -256,7 +263,7 @@ THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, w
 
 			if (scope.crouching && scope.isOnObject) {
 
-				scope.walking = true;
+				scope.runing = true;
 				if (!crouched && !scope.justCrouched) {
 					scope.updatePlayerHeight(halfHeight);
 					crouchSmoothing = 0;
@@ -277,14 +284,14 @@ THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, w
 				crouchSmoothing += 2;
 					//console.log(smoothedHeight)
 				crouched = false;
-				scope.walking = false;
+				scope.runing = false;
 
 			}
 
 			// Jumping - must come after isBelowObject but before isOnObject
 			if (scope.jumping) {
 
-				scope.walking = false;
+				scope.runing = false;
 				scope.crouching = false;
 
 				if (scope.jumps === 0 && !scope.isBelowObject) {
@@ -301,8 +308,8 @@ THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, w
 
 			// Movements
 
-			if ( scope.movements.forward && !scope.walking && !scope.movements.locks.forward) scope.velocity.z -= 400.0 * scope.delta;
-			if ( scope.movements.forward && scope.walking && !scope.movements.locks.forward) scope.velocity.z -= 1000.0 * scope.delta;
+			if ( scope.movements.forward && !scope.runing && !scope.movements.locks.forward) scope.velocity.z -= 400.0 * scope.delta;
+			if ( scope.movements.forward && scope.runing && !scope.movements.locks.forward) scope.velocity.z -= 1000.0 * scope.delta;
 			if ( scope.movements.backward && !scope.movements.locks.backward ) scope.velocity.z += 400.0 * scope.delta;
 			if ( scope.movements.left && !scope.movements.locks.left ) scope.velocity.x -= 400.0 * scope.delta;
 			if ( scope.movements.right && !scope.movements.locks.right ) scope.velocity.x += 400.0 * scope.delta;
