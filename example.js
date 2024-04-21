@@ -108,6 +108,9 @@ var Harvest = (function () {
 				objects.push(treeTrunk);
 				objects.push(treeFoliage);
 			}
+			window.addEventListener('load', function() {
+				document.getElementById('loading-screen').style.display = 'none';
+			});
 
 			//background color
 			scene.background = new THREE.Color(0x000000);
@@ -154,9 +157,12 @@ var Harvest = (function () {
 			sky.material.side = THREE.BackSide;
 			scene.add(sky);*/
 			//weak ambient light
-			
+
+
 			var ambientLight = new THREE.AmbientLight(0x404040, 0.08);
 			scene.add(ambientLight);
+
+			
 
 			//cenário 1
 
@@ -240,6 +246,10 @@ var Harvest = (function () {
 			objects.push(barn);
 			
 			scene.add(barn);
+
+			//cenário 2
+
+
 			
 
 			camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 5000 );
@@ -277,7 +287,54 @@ var Harvest = (function () {
 			
   
       }
+	  function atualizarContagemNaTela(contagem) {
+		// Atualiza o elemento de texto na interface do usuário com a contagem de páginas
+		elementoContagem.innerHTML = "Páginas coletadas: " + contagem;
+	}
 
+	function coletarPagina(pagina) {
+		// Remove a página do mapa
+		removerPaginaDoMapa(pagina);
+		// Incrementa a contagem de páginas coletadas
+		paginasColetadas++;
+		// Atualiza a exibição da contagem de páginas na tela
+		atualizarContagemNaTela(paginasColetadas);
+	}
+
+	function removerPaginaDoMapa(pagina) {
+		// Remove a página da cena
+		scene.remove(pagina);
+		// Remove a página do array de objetos
+		objects = objects.filter(function (obj) {
+			return obj !== pagina;
+		});
+	}
+
+	function addPageToScene() {
+		// white page texture
+		var pageTexture = new THREE.TextureLoader().load('page.jpg');
+		var pageMaterial = new THREE.MeshBasicMaterial({ map: pageTexture });
+		//double sided
+		pageMaterial.side = THREE.DoubleSide;
+	
+		// Geometry for the page
+		var pageGeometry = new THREE.PlaneGeometry(20, 20); // Adjust size as needed
+		var page = new THREE.Mesh(pageGeometry, pageMaterial);
+	
+		// Position the page in the scene
+		page.position.set(0, 10, 0); // Adjust position as needed
+
+		// Add the page to the scene
+		scene.add(page);
+	
+		// Add the page to the objects array for collision detection
+		objects.push(page);
+	
+		// Return a reference to the page mesh
+		return page;
+	}
+
+	
 
 
 function animate() {
@@ -356,6 +413,11 @@ function handleKeyInteraction(keyCode, boolean) {
 
 		case 67: // crouch (CTRL + W etc destroys tab in Chrome!)
 			controls.crouch(boolean);
+
+		//press E to interact with objects
+		case 69:
+			controls.interact();
+			break;
 
 	}
 }
