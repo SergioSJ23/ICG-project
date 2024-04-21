@@ -285,3 +285,29 @@ body {
     font-size: 24px;
     margin-top: 20px;
 }
+
+#game-over {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: none; /* Inicialmente oculto */
+    z-index: 9999; /* Para garantir que esteja na parte superior */
+}
+
+#game-lose {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: none; /* Inicialmente oculto */
+    z-index: 9999; /* Para garantir que esteja na parte superior */
+}

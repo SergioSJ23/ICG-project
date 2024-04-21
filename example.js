@@ -19,6 +19,9 @@ var Harvest = (function () {
 	  var spotLight;
       var WON = false;
       var timer;
+	  var ambientSound = new Audio('ambience.mp3');
+	  var screamSound = new Audio('scream.mp3');
+	  var pageSound = new Audio('page.mp3');
       
   
   
@@ -36,8 +39,12 @@ var Harvest = (function () {
 			eventHandlers();
 			scene = new THREE.Scene();
 			
+			//every 60 secs play a scream sound
+			screamSound.volume = 1.0;
+			setInterval(function() {
+				screamSound.play();
+			}, 60000);
 			
-
 
 	
 			// Floor
@@ -158,9 +165,130 @@ var Harvest = (function () {
 			scene.add(sky);*/
 			//weak ambient light
 
+			var page = addPageToScene(3100, 3431);
+			var page2 = addPageToScene(30, 30);
+			var page3 = addPageToScene(60, 60);
+			var page4 = addPageToScene(90, 90);
+			var page5 = addPageToScene(120, 120);
+			var page6 = addPageToScene(150, 150);
+			var page7 = addPageToScene(180, 180);
+			var page8 = addPageToScene(210, 210);
+						//add ambient sound lower volume
+						ambientSound.volume = 0.05;
+						//make sure it plays
+						ambientSound.play();
+						//loop the sound
+						ambientSound.loop = true;
+
+			
+			//make the page disappear when the player interacts with it
+
+			const raycaster = new THREE.Raycaster();
+			const mouse = new THREE.Vector2();
+			const clickMouse = new THREE.Vector2();
+			var draggableObjects = THREE.Object3D;
+			var counterPage = 0;
+
+			createStairs();
+			
+
+
+
+
+			window.addEventListener('click', function() {
+				clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+				clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+				raycaster.setFromCamera(clickMouse, camera);
+				var intersects = raycaster.intersectObjects(objects);
+				if (intersects.length > 0) {
+					if (intersects[0].object === page) {
+						counterPage++;
+						elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
+						pageSound.play();
+						removerPaginaDoMapa(page);
+						checkPageCounter(counterPage);
+					}
+					if (intersects[0].object === page2) {
+						counterPage++;
+						elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
+						pageSound.play();
+						removerPaginaDoMapa(page2);
+						checkPageCounter(counterPage);
+					}
+					if (intersects[0].object === page3) {
+						counterPage++;
+						elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
+						pageSound.play();
+						removerPaginaDoMapa(page3);
+						checkPageCounter(counterPage);
+					}
+					if (intersects[0].object === page4) {
+						counterPage++;
+						elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
+						pageSound.play();
+						removerPaginaDoMapa(page4);
+						checkPageCounter(counterPage);
+					}
+					if (intersects[0].object === page5) {
+						counterPage++;
+						elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
+						pageSound.play();
+						removerPaginaDoMapa(page5);
+						checkPageCounter(counterPage);
+					}
+					if (intersects[0].object === page6) {
+						counterPage++;
+						elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
+						pageSound.play();
+						removerPaginaDoMapa(page6);
+						checkPageCounter(counterPage);
+					}
+					if (intersects[0].object === page7) {
+						counterPage++;
+						elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
+						pageSound.play();
+						removerPaginaDoMapa(page7);
+						checkPageCounter(counterPage);
+					}
+					if (intersects[0].object === page8) {
+						counterPage++;
+						elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
+						pageSound.play();
+						removerPaginaDoMapa(page8);
+						checkPageCounter(counterPage);
+					}
+
+				}
+			});
+
+
+			//page counter on screen
+			var elementoContagem = document.createElement('div');
+			elementoContagem.style.position = 'absolute';
+			elementoContagem.style.width = 100;
+			elementoContagem.style.height = 100;
+			elementoContagem.style.backgroundColor = "black";
+			elementoContagem.style.color = "white";
+			elementoContagem.style.top = 10 + 'px';
+			elementoContagem.style.left = 10 + 'px';
+			elementoContagem.style.zIndex = 1;
+			elementoContagem.style.textAlign = 'center';
+			elementoContagem.style.fontSize = '20px';
+			//update the counter
+			elementoContagem.innerHTML = "Páginas coletadas: 0"
+			document.body.appendChild(elementoContagem);
+			
 
 			var ambientLight = new THREE.AmbientLight(0x404040, 0.08);
 			scene.add(ambientLight);
+
+			//add event listener to the window to check if timer is at 6 seconds
+			window.addEventListener('load', function() {
+				//wait 6 secs the call endGame function
+				setTimeout(endGame, 300000);
+
+
+			});
 
 			
 
@@ -249,6 +377,178 @@ var Harvest = (function () {
 
 			//cenário 2
 
+			const stairs = new THREE.Group();
+			const stepWidth = 60; // Largura do degrau
+			const stepHeight = 10; // Altura do degrau
+			var stepDepth = 50; // Profundidade do degrau
+			let currentHeight = 0;
+			const totalStepsPerSide = 5; // Quantos degraus por lado
+			const totalSides = 8 // Quantos lados tem a escada quadrada
+			
+			// Criar os degraus em cada lado do quadrado
+			for (let side = 0; side < totalSides; side++) {
+			  for (let i = 0; i < totalStepsPerSide; i++) {
+
+				const stepGeometry = new THREE.BoxGeometry(stepWidth, stepHeight, stepDepth);
+				const stepMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+				const step = new THREE.Mesh(stepGeometry, stepMaterial);
+				objects.push(step);
+			
+				let xPosition = 0;
+				let zPosition = 0;
+			
+				// Posicionar os degraus com base no lado atual da escada
+				switch (side) {
+				  case 0: // Lado 1
+					xPosition = i * stepWidth;
+					zPosition = 0;
+					break;
+				  case 1: // Lado 2
+					xPosition = totalStepsPerSide * stepWidth;
+					zPosition = i * stepDepth;
+					break;
+				  case 2: // Lado 3
+					xPosition = totalStepsPerSide * stepWidth - i * stepWidth;
+					zPosition = totalStepsPerSide * stepDepth;
+					break;
+				  case 3: // Lado 4
+					xPosition = 0;
+					zPosition = totalStepsPerSide * stepDepth - i * stepDepth;
+					break;
+				  case 4: // Lado 5
+					xPosition = i * stepWidth;
+					zPosition = 0;
+					break;
+				  case 5: // Lado 6
+					xPosition = totalStepsPerSide * stepWidth;
+					zPosition = i * stepDepth;
+					break;
+				  case 6: // Lado 7	
+					xPosition = totalStepsPerSide * stepWidth - i * stepWidth;
+					zPosition = totalStepsPerSide * stepDepth;
+					break;
+				  case 7: // Lado 8
+					xPosition = 0;
+					zPosition = totalStepsPerSide * stepDepth - i * stepDepth;
+					break;
+				}
+			
+				step.position.set(xPosition, currentHeight, zPosition);
+				stairs.add(step);
+				currentHeight += stepHeight; // Incrementar a altura para o próximo degrau
+			  }
+			}
+			
+			// Posicione a escada inteira, se necessário
+			stairs.position.set(0, 0, 0);
+			
+			// Adicione a escada à cena
+
+
+			// Profundidade das pernas da torre
+			const legOffset = -20; // Quão para dentro as pernas estarão da ponta dos degraus
+			const legHeight = currentHeight; // Altura total das pernas igual à altura total da escada
+			const legWidth = 10; // Largura das pernas da torre
+			const legDepth = 10; // Profundidade das pernas da torre
+
+			// Criar as pernas
+			for (let i = 0; i < 4; i++) {
+			const legGeometry = new THREE.BoxGeometry(legWidth, legHeight, legDepth);
+			const legMaterial = new THREE.MeshLambertMaterial({ color: 0x777777 });
+			const leg = new THREE.Mesh(legGeometry, legMaterial);
+
+			let xPosition = (i % 2) * ((totalStepsPerSide - 1) * stepWidth + legOffset) - legOffset; // X
+			let zPosition = Math.floor(i / 2) * ((totalStepsPerSide - 1) * stepDepth + legOffset) - legOffset; // Z
+
+			leg.position.set(xPosition, legHeight / 2, zPosition);
+			stairs.add(leg); // Adicionar as pernas ao grupo de escadas para manter tudo junto
+			}
+
+
+			// Criar a entrada da casa
+			const doorWidth = 15;
+			const doorHeight = 20;
+			const doorDepth = houseDepth + 1; // Garantir que a porta sobressaia da casa
+			const doorGeometry = new THREE.BoxGeometry(doorWidth, doorHeight, doorDepth);
+			const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x000000, transparent: true, opacity: 0.5 });
+			const door = new THREE.Mesh(doorGeometry, doorMaterial);
+
+			door.position.set(
+			(totalStepsPerSide * stepWidth - doorWidth) / 2,
+			legHeight + doorHeight / 2,
+			(totalStepsPerSide * stepDepth - houseDepth) / 2
+			);
+			stairs.add(door); // Adicionar a porta ao grupo de escadas
+
+			// Ajustar a posição da escada e do conjunto torre de vigia
+			stairs.position.set(-totalStepsPerSide * stepWidth / 2, 0, -totalStepsPerSide * stepDepth / 2);
+
+			// Adicionar a torre de vigia à lista de objetos para interações futuras
+			objects.push(stairs);
+
+
+
+
+				var house = new THREE.Group();
+			
+				// Parâmetros da casa
+				var houseWidth = 270; // Largura da casa menor que a do celeiro
+				var houseHeight = 200; // Altura da casa adequada para o topo da torre
+				var houseDepth = 270; // Profundidade da casa
+			
+				//HOUSE DONE LIKE BARN BUT SMALLER
+				var wallTexture = new THREE.TextureLoader().load('wall_texture.jpg');
+				var wallMaterial = new THREE.MeshStandardMaterial({ map: wallTexture });
+
+				// Paredes
+				var wall1Geometry = new THREE.BoxGeometry(houseWidth, houseHeight, 10);
+				var wall1 = new THREE.Mesh(wall1Geometry, wallMaterial);
+				wall1.position.set(0, houseHeight / 3, houseDepth / 2);
+				objects.push(wall1);
+				house.add(wall1);
+
+				var wall2Geometry = new THREE.BoxGeometry(10, houseHeight, houseDepth);
+				var wall2 = new THREE.Mesh(wall2Geometry, wallMaterial);
+				wall2.position.set(-houseWidth / 2, houseHeight / 3, 0);
+				objects.push(wall2);
+				house.add(wall2);
+
+				var wall3 = wall2.clone();
+				wall3.position.x = houseWidth / 2;
+				objects.push(wall3);
+				house.add(wall3);
+				
+				var wall4Geometry = new THREE.BoxGeometry(450, houseHeight, 10);
+				var wall4 = new THREE.Mesh(wall4Geometry, wallMaterial);
+				wall4.position.set(275, houseHeight / 3, -houseDepth / 2);
+				objects.push(wall4);
+				house.add(wall4);
+
+				var wall5Geometry = new THREE.BoxGeometry(450, houseHeight, 10);
+				var wall5 = new THREE.Mesh(wall5Geometry, wallMaterial);
+				wall5.position.set(-275, houseHeight / 3, -houseDepth / 2);
+				objects.push(wall5);
+				house.add(wall5);
+
+				// Telhado
+				var roofGeometry = new THREE.PlaneGeometry(houseWidth, houseDepth);
+				var roofMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('wall_texture.jpg') });
+				var roof = new THREE.Mesh(roofGeometry, roofMaterial);
+				roof.rotation.x = Math.PI / 2;
+				roof.position.y = houseHeight - 25;
+				objects.push(roof);
+				house.add(roof);
+				
+
+			
+			// Posicionar a casa
+			house.position.set(-5, 400, 0);
+
+			// Adicionar a casa à cena
+			scene.add(house);
+			scene.add(stairs);
+			
+
 
 			
 
@@ -287,19 +587,7 @@ var Harvest = (function () {
 			
   
       }
-	  function atualizarContagemNaTela(contagem) {
-		// Atualiza o elemento de texto na interface do usuário com a contagem de páginas
-		elementoContagem.innerHTML = "Páginas coletadas: " + contagem;
-	}
-
-	function coletarPagina(pagina) {
-		// Remove a página do mapa
-		removerPaginaDoMapa(pagina);
-		// Incrementa a contagem de páginas coletadas
-		paginasColetadas++;
-		// Atualiza a exibição da contagem de páginas na tela
-		atualizarContagemNaTela(paginasColetadas);
-	}
+	  
 
 	function removerPaginaDoMapa(pagina) {
 		// Remove a página da cena
@@ -310,29 +598,82 @@ var Harvest = (function () {
 		});
 	}
 
-	function addPageToScene() {
-		// white page texture
-		var pageTexture = new THREE.TextureLoader().load('page.jpg');
-		var pageMaterial = new THREE.MeshBasicMaterial({ map: pageTexture });
-		//double sided
-		pageMaterial.side = THREE.DoubleSide;
-	
-		// Geometry for the page
-		var pageGeometry = new THREE.PlaneGeometry(20, 20); // Adjust size as needed
-		var page = new THREE.Mesh(pageGeometry, pageMaterial);
-	
-		// Position the page in the scene
-		page.position.set(0, 10, 0); // Adjust position as needed
 
-		// Add the page to the scene
-		scene.add(page);
-	
-		// Add the page to the objects array for collision detection
-		objects.push(page);
-	
-		// Return a reference to the page mesh
-		return page;
+
+//make stairs that go up in a square shape
+function createStairs() {
+	var stairs = new THREE.Group();
+	var stairWidth = 100;
+	var stairHeight = 10;
+	var stairDepth = 50;
+	var stairTexture = new THREE.TextureLoader().load('wall_texture.jpg');
+	var stairMaterial = new THREE.MeshStandardMaterial({ map: stairTexture });
+
+	for (var i = 0; i < 10; i++) {
+		var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
+		var stair = new THREE.Mesh(stairGeometry, stairMaterial);
+		stair.position.set(0, i * stairHeight, i * stairDepth);
+		stairs.add(stair);
+		objects.push(stair);
 	}
+
+	for (var i = 0; i < 10; i++) {
+		var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
+		var stair = new THREE.Mesh(stairGeometry, stairMaterial);
+		stair.position.set(i * stairWidth, i * stairHeight, 10 * stairDepth);
+		stairs.add(stair);
+		objects.push(stair);
+	}
+
+	for (var i = 0; i < 10; i++) {
+		var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
+		var stair = new THREE.Mesh(stairGeometry, stairMaterial);
+		stair.position.set(10 * stairWidth, i * stairHeight, 10 * stairDepth - i * stairDepth);
+		stairs.add(stair);
+		objects.push(stair);
+	}
+
+	for (var i = 0; i < 10; i++) {
+		var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
+		var stair = new THREE.Mesh(stairGeometry, stairMaterial);
+		stair.position.set(10 * stairWidth - i * stairWidth, i * stairHeight, 0);
+		stairs.add(stair);
+		objects.push(stair);
+
+	}
+	stairs.position.set(3000, 0, -3000);
+
+	return stairs;
+}
+	var stairs = createStairs();
+	scene.add(stairs);
+
+	function addPageToScene(x, z) {
+	
+			// white page texture
+			var pageTexture = new THREE.TextureLoader().load('page1.webp');
+			var pageMaterial = new THREE.MeshBasicMaterial({ map: pageTexture });
+			//double sided
+			pageMaterial.side = THREE.DoubleSide;
+		
+			// Geometry for the page
+			var pageGeometry = new THREE.PlaneGeometry(20, 20); // Adjust size as needed
+			var page = new THREE.Mesh(pageGeometry, pageMaterial);
+		
+			// Position the page in the scene
+			page.position.set(x, 10, z); // Adjust position as needed
+
+			// Add the page to the scene
+			scene.add(page);
+		
+			// Add the page to the objects array for collision detection
+			objects.push(page);
+		
+			// Return a reference to the page mesh
+			return page;
+	}
+
+
 
 	
 
@@ -349,6 +690,27 @@ function animate() {
 	renderer.render( scene, camera );
 
 }
+
+function checkPageCounter(counterPage) {
+	if (counterPage === 8) {
+		WON = true;
+		clearInterval(timer);
+		document.getElementById("game-over").style.display = "block";
+		document.getElementById("game-over").innerHTML = "Parabéns! Coletaste todas as páginas! <br> Tempo: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Voltando ao menu inicial em 20 segundos...";
+		var countDown = 20;
+		var countDownTimer = setInterval(function() {
+			countDown--;
+			document.getElementById("game-over").innerHTML = "Parabéns! Coletaste todas as páginas! <br> Tempo: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Voltando ao menu inicial em " + countDown + " segundos...";
+			if (countDown <= 0) {
+				clearInterval(countDownTimer);
+				window.location.href = "index.html";
+			}
+		}, 1000);
+		setTimeout(reloadPage, 20000);
+		
+
+	}
+}
   
 function randomTexture(maxTextures) {
 	return Math.floor(Math.random() * maxTextures) + 1;
@@ -362,6 +724,24 @@ function initialiseTimer() {
 		document.getElementById("seconds").innerHTML = String(pad(++sec%60));
 		document.getElementById("minutes").innerHTML = String(pad(parseInt(sec/60,10)));
 	}, 1000);
+	
+
+}
+
+function endGame() {
+	clearInterval(timer);
+	document.getElementById("game-over").style.display = "block";
+	document.getElementById("game-over").innerHTML = "Game Over! <br> Voltando ao menu inicial em 20 segundos...";
+	var countDown = 20;
+	var countDownTimer = setInterval(function() {
+		countDown--;
+		document.getElementById("game-over").innerHTML = "Game Over! <br> Voltando ao menu inicial em " + countDown + " segundos...";
+		if (countDown <= 0) {
+			clearInterval(countDownTimer);
+			window.location.href = "index.html";
+		}
+	}, 1000);
+	setTimeout(reloadPage, 20000);
 }
 
 function eventHandlers() {
@@ -432,11 +812,6 @@ function onWindowResize() {
 }
 
 
-function fallingBoxes(cube, pos, delay) {
-	//console.log(cube,pos,delay)
-	setTimeout(function() { cube.position.setY(pos); }, delay);
-}
-
 return {
 	// Public methods and variables
 		
@@ -464,5 +839,9 @@ getInstance: function () {
 	};
 
 })();
+
+
+
+
 
 harvest = Harvest.getInstance();
