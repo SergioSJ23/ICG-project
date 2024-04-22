@@ -119,6 +119,39 @@ var Harvest = (function () {
 				document.getElementById('loading-screen').style.display = 'none';
 			});
 
+			//make a static tree
+			var treeTrunkGeometry = new THREE.CylinderGeometry(10, 10, 100, 32);
+			var trunkTexture = new THREE.TextureLoader().load("trunk.jpg");
+			//standard material
+			var trunkMaterial = new THREE.MeshStandardMaterial({ map: trunkTexture });
+			var treeTrunk = new THREE.Mesh(treeTrunkGeometry, trunkMaterial);
+			treeTrunk.castShadow = true; //default is false
+			treeTrunk.receiveShadow = false; //default
+			objects.push(treeTrunk);
+			// Randomize foliage size
+			var foliageHeight = 200; // Random height for the foliage
+			var foliageRadius = 50; // Random radius for the foliage
+
+			var treeFoliageGeometry = new THREE.ConeGeometry(foliageRadius, foliageHeight, 32);
+			var foliageTexture = new THREE.TextureLoader().load("leaves.jpg");
+			//standard material
+			var foliageMaterial = new THREE.MeshStandardMaterial({ map: foliageTexture });
+
+			var treeFoliage = new THREE.Mesh(treeFoliageGeometry, foliageMaterial);
+			treeFoliage.position.y = 50 + foliageHeight / 2;
+			treeFoliage.castShadow = true;
+			treeFoliage.receiveShadow = false;
+			objects.push(treeFoliage);
+			treeTrunk.add(treeFoliage);
+
+			treeTrunk.position.x = 0;
+			treeTrunk.position.y = 0; // Adjust the y position according to your scene
+			treeTrunk.position.z = -500;
+
+			//add tree to scene
+			scene.add(treeTrunk);
+
+
 			//background color
 			scene.background = new THREE.Color(0x000000);
 
@@ -165,14 +198,14 @@ var Harvest = (function () {
 			scene.add(sky);*/
 			//weak ambient light
 
-			var page = addPageToScene(3100, 3431);
-			var page2 = addPageToScene(30, 30);
-			var page3 = addPageToScene(60, 60);
-			var page4 = addPageToScene(90, 90);
-			var page5 = addPageToScene(120, 120);
-			var page6 = addPageToScene(150, 150);
-			var page7 = addPageToScene(180, 180);
-			var page8 = addPageToScene(210, 210);
+			var page = addPageToScene(3100,10, 3431);
+			var page2 = addPageToScene(-3175, 10, -3319);
+			var page3 = addPageToScene(-3350, 420, -3345);
+			var page4 = addPageToScene(0, 10, -490);
+			var page5 = addPageToScene(120, 10, 120);
+			var page6 = addPageToScene(150, 10, 150);
+			var page7 = addPageToScene(180, 10, 180);
+			var page8 = addPageToScene(210, 10, 210);
 						//add ambient sound lower volume
 						ambientSound.volume = 0.05;
 						//make sure it plays
@@ -390,7 +423,8 @@ var Harvest = (function () {
 			  for (let i = 0; i < totalStepsPerSide; i++) {
 
 				const stepGeometry = new THREE.BoxGeometry(stepWidth, stepHeight, stepDepth);
-				const stepMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+				const stepTexture = new THREE.TextureLoader().load('wood2.jpg');
+				const stepMaterial = new THREE.MeshLambertMaterial({ map: stepTexture});
 				const step = new THREE.Mesh(stepGeometry, stepMaterial);
 				objects.push(step);
 			
@@ -446,15 +480,16 @@ var Harvest = (function () {
 
 
 			// Profundidade das pernas da torre
-			const legOffset = -20; // Quão para dentro as pernas estarão da ponta dos degraus
-			const legHeight = currentHeight; // Altura total das pernas igual à altura total da escada
+			const legOffset = -25; // Quão para dentro as pernas estarão da ponta dos degraus
+			const legHeight = 400; // Altura total das pernas igual à altura total da escada
 			const legWidth = 10; // Largura das pernas da torre
 			const legDepth = 10; // Profundidade das pernas da torre
 
 			// Criar as pernas
 			for (let i = 0; i < 4; i++) {
 			const legGeometry = new THREE.BoxGeometry(legWidth, legHeight, legDepth);
-			const legMaterial = new THREE.MeshLambertMaterial({ color: 0x777777 });
+			const legtexture = new THREE.TextureLoader().load('wood.jpg');
+			const legMaterial = new THREE.MeshLambertMaterial({ map: legtexture});
 			const leg = new THREE.Mesh(legGeometry, legMaterial);
 
 			let xPosition = (i % 2) * ((totalStepsPerSide - 1) * stepWidth + legOffset) - legOffset; // X
@@ -465,88 +500,112 @@ var Harvest = (function () {
 			}
 
 
-			// Criar a entrada da casa
-			const doorWidth = 15;
-			const doorHeight = 20;
-			const doorDepth = houseDepth + 1; // Garantir que a porta sobressaia da casa
-			const doorGeometry = new THREE.BoxGeometry(doorWidth, doorHeight, doorDepth);
-			const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x000000, transparent: true, opacity: 0.5 });
-			const door = new THREE.Mesh(doorGeometry, doorMaterial);
-
-			door.position.set(
-			(totalStepsPerSide * stepWidth - doorWidth) / 2,
-			legHeight + doorHeight / 2,
-			(totalStepsPerSide * stepDepth - houseDepth) / 2
-			);
-			stairs.add(door); // Adicionar a porta ao grupo de escadas
 
 			// Ajustar a posição da escada e do conjunto torre de vigia
-			stairs.position.set(-totalStepsPerSide * stepWidth / 2, 0, -totalStepsPerSide * stepDepth / 2);
+			//ROTATE 180 ON Y WITHOUT CHANGING PLACE
+			stairs.rotation.y = Math.PI;
+			stairs.position.set(-totalStepsPerSide * stepWidth / 2-3000, 0, -totalStepsPerSide * stepDepth / 2-3000);
 
 			// Adicionar a torre de vigia à lista de objetos para interações futuras
 			objects.push(stairs);
 
 
 
+			var house = new THREE.Group();
 
-				var house = new THREE.Group();
+			// Parâmetros da casa
+			var houseWidth = 230;
+			var houseHeight = 200;
+			var houseDepth = 230;
+
+			// Texturas e materiais
+			var wallTexture = new THREE.TextureLoader().load('watchtower.jpg');
+			var wallMaterial = new THREE.MeshStandardMaterial({ map: wallTexture });
+			var floorTexture = new THREE.TextureLoader().load('floor.jpg');
+			var floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
+
+			// Paredes
+			var wall1Geometry = new THREE.BoxGeometry(houseWidth, houseHeight, 10);
+			var wall1 = new THREE.Mesh(wall1Geometry, wallMaterial);
+			wall1.position.set(0, houseHeight / 2, houseDepth / 2+2);
+			objects.push(wall1);
+			house.add(wall1);
+
+			// Paredes laterais com espaço para porta
+			var doorWidth = 80; // Largura da porta
+			var wallSideGeometry = new THREE.BoxGeometry(10, houseHeight, 140);
+			var wall2 = new THREE.Mesh(wallSideGeometry, wallMaterial);
+			wall2.position.set(-houseWidth / 2, houseHeight / 2, 45);
+			objects.push(wall2);
+			house.add(wall2);
+
+
+			var wallSideGeometry = new THREE.BoxGeometry(10, houseHeight, 40);
+			var wall3 = new THREE.Mesh(wallSideGeometry, wallMaterial);
+
+			wall3.position.set(-houseWidth / 2, houseHeight / 2, -90);
+			objects.push(wall3);
+			house.add(wall3);
+
+			//wall4 on top and between the two walls	
+			var wall4Geometry = new THREE.BoxGeometry(10, houseHeight/3, 60);
+			var wall4 = new THREE.Mesh(wall4Geometry, wallMaterial);
+			wall4.position.set(-houseWidth / 2, houseHeight-33, -52);
+			objects.push(wall4);
+			house.add(wall4);
+
+			//clone wall 1
+			var wall5 = wall1.clone();
+			wall5.position.set(0, houseHeight / 2, -houseDepth / 2);
+			objects.push(wall5);
+			house.add(wall5);
+
+			var wall6Geoçmetry = new THREE.BoxGeometry(10, houseHeight, houseDepth);
+			var wall6 = new THREE.Mesh(wall6Geoçmetry, wallMaterial);
+			wall6.position.set(houseWidth / 2-4, houseHeight / 2, 0);
+			objects.push(wall6);
+			house.add(wall6);
+
+			// Chão
+			var floorGeometry = new THREE.BoxGeometry(houseWidth, 10, houseDepth);
+			var floorTexture = new THREE.TextureLoader().load('floor.jpg');
+			var floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
+			var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+			floor.position.set(0, 5, 0); // Eleva levemente o chão para evitar z-fighting
+			objects.push(floor);
+			house.add(floor);
+
+			// Telhado
+			var roofGeometry = new THREE.PlaneGeometry(houseWidth, houseDepth);
+			var roofMaterial = new THREE.MeshStandardMaterial({ map: wallTexture });
+			var roof = new THREE.Mesh(roofGeometry, roofMaterial);
+			roof.rotation.x = Math.PI / 2;
+			roof.position.y = houseHeight;
+			objects.push(roof);
+			house.add(roof);
+
+			// Paredes internas com espaço para porta
+			var wallInteriorGeometry = new THREE.BoxGeometry(10, houseHeight, (houseDepth - doorWidth) / 2 +10);
+			var wallInterior1 = new THREE.Mesh(wallInteriorGeometry, wallMaterial);
+			wallInterior1.position.set(0, houseHeight / 2, doorWidth);
+			house.add(wallInterior1);
+
+			var wallInterior2 = new THREE.Mesh(wallInteriorGeometry, wallMaterial);
+			wallInterior2.position.set(0, houseHeight / 2, -(doorWidth));
+			house.add(wallInterior2);
 			
-				// Parâmetros da casa
-				var houseWidth = 270; // Largura da casa menor que a do celeiro
-				var houseHeight = 200; // Altura da casa adequada para o topo da torre
-				var houseDepth = 270; // Profundidade da casa
 			
-				//HOUSE DONE LIKE BARN BUT SMALLER
-				var wallTexture = new THREE.TextureLoader().load('wall_texture.jpg');
-				var wallMaterial = new THREE.MeshStandardMaterial({ map: wallTexture });
-
-				// Paredes
-				var wall1Geometry = new THREE.BoxGeometry(houseWidth, houseHeight, 10);
-				var wall1 = new THREE.Mesh(wall1Geometry, wallMaterial);
-				wall1.position.set(0, houseHeight / 3, houseDepth / 2);
-				objects.push(wall1);
-				house.add(wall1);
-
-				var wall2Geometry = new THREE.BoxGeometry(10, houseHeight, houseDepth);
-				var wall2 = new THREE.Mesh(wall2Geometry, wallMaterial);
-				wall2.position.set(-houseWidth / 2, houseHeight / 3, 0);
-				objects.push(wall2);
-				house.add(wall2);
-
-				var wall3 = wall2.clone();
-				wall3.position.x = houseWidth / 2;
-				objects.push(wall3);
-				house.add(wall3);
-				
-				var wall4Geometry = new THREE.BoxGeometry(450, houseHeight, 10);
-				var wall4 = new THREE.Mesh(wall4Geometry, wallMaterial);
-				wall4.position.set(275, houseHeight / 3, -houseDepth / 2);
-				objects.push(wall4);
-				house.add(wall4);
-
-				var wall5Geometry = new THREE.BoxGeometry(450, houseHeight, 10);
-				var wall5 = new THREE.Mesh(wall5Geometry, wallMaterial);
-				wall5.position.set(-275, houseHeight / 3, -houseDepth / 2);
-				objects.push(wall5);
-				house.add(wall5);
-
-				// Telhado
-				var roofGeometry = new THREE.PlaneGeometry(houseWidth, houseDepth);
-				var roofMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('wall_texture.jpg') });
-				var roof = new THREE.Mesh(roofGeometry, roofMaterial);
-				roof.rotation.x = Math.PI / 2;
-				roof.position.y = houseHeight - 25;
-				objects.push(roof);
-				house.add(roof);
-				
-
-			
-			// Posicionar a casa
-			house.position.set(-5, 400, 0);
+			// Posicionar a casafrente tras e lado
+			house.position.set(-3280, 390, -3240);
+			house.rotation.y = Math.PI;
 
 			// Adicionar a casa à cena
 			scene.add(house);
 			scene.add(stairs);
+
+			// Cenario 3
+
+ 
 			
 
 
@@ -648,7 +707,7 @@ function createStairs() {
 	var stairs = createStairs();
 	scene.add(stairs);
 
-	function addPageToScene(x, z) {
+	function addPageToScene(x,y, z) {
 	
 			// white page texture
 			var pageTexture = new THREE.TextureLoader().load('page1.webp');
@@ -661,7 +720,7 @@ function createStairs() {
 			var page = new THREE.Mesh(pageGeometry, pageMaterial);
 		
 			// Position the page in the scene
-			page.position.set(x, 10, z); // Adjust position as needed
+			page.position.set(x, y, z); // Adjust position as needed
 
 			// Add the page to the scene
 			scene.add(page);
@@ -685,10 +744,19 @@ function animate() {
 	if ( controls.enabled ) {
 
 		controls.updateControls();
+		updatePlayerCoordinates();
 
 	}
 	renderer.render( scene, camera );
 
+}
+
+function updatePlayerCoordinates() {
+    if (controls && controls.getPlayer()) {
+        var playerPosition = controls.getPlayer().position; // Assume que controls.getPlayer() retorna o objeto THREE.Mesh ou similar do jogador
+        var coordsText = `Coordenadas: X=${playerPosition.x.toFixed(2)}, Y=${playerPosition.y.toFixed(2)}, Z=${playerPosition.z.toFixed(2)}`;
+        document.getElementById('playerCoords').innerText = coordsText;
+    }
 }
 
 function checkPageCounter(counterPage) {
