@@ -616,16 +616,21 @@ var Harvest = (function () {
 			camera.position.z = 0;
 			camera.rotation.y = Math.PI;
 
+			//weak ambiente light
+			var ambientLight = new THREE.AmbientLight(0x404040, 0.08);
+			scene.add(ambientLight);
+			
+
 			spotLight = new THREE.SpotLight(0xffffff, 1, 0, 0.7 );
 			camera.add(spotLight);
 			camera.add(spotLight.target);
 
 			
-			
+			spotLight.intensity = 2;
 			spotLight.target.position.z = -1;
 			spotLight.target.position.y = 1;
 			spotLight.target.position.x = 0;
-			spotLight.distance = 400;
+			spotLight.distance = 2000;
 			spotLight.penumbra = 0.5;
 
 			scene.add(camera);
