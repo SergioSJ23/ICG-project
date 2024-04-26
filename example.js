@@ -1,6 +1,7 @@
 
 var Harvest = (function () {
 	
+	
     // Instance stores a reference to the Singleton
     var instance;
   
@@ -30,6 +31,9 @@ var Harvest = (function () {
   
       var prevTime = performance.now();
       var velocity = new THREE.Vector3();
+
+	  
+		  
   
   
       function init() {
@@ -44,11 +48,13 @@ var Harvest = (function () {
 			setInterval(function() {
 				screamSound.play();
 			}, 60000);
+
+
 			
 
 	
 			// Floor
-			const geometry = new THREE.PlaneGeometry(15000, 15000, 32);
+			const geometry = new THREE.PlaneGeometry(5000, 5000, 32);
 			const groundMaterial = new THREE.MeshPhysicalMaterial();
 			const plane = new THREE.Mesh(geometry, groundMaterial);
 
@@ -69,6 +75,10 @@ var Harvest = (function () {
 
 			objects.push(plane);
 			scene.add(plane);
+
+			
+
+
 						
 			// Trees
 			
@@ -119,6 +129,10 @@ var Harvest = (function () {
 				document.getElementById('loading-screen').style.display = 'none';
 			});
 
+
+			// Load the FBX model
+			
+
 			//make a static tree
 			var treeTrunkGeometry = new THREE.CylinderGeometry(10, 10, 100, 32);
 			var trunkTexture = new THREE.TextureLoader().load("trunk.jpg");
@@ -140,7 +154,7 @@ var Harvest = (function () {
 			var treeFoliage = new THREE.Mesh(treeFoliageGeometry, foliageMaterial);
 			treeFoliage.position.y = 50 + foliageHeight / 2;
 			treeFoliage.castShadow = true;
-			treeFoliage.receiveShadow = false;
+			
 			objects.push(treeFoliage);
 			treeTrunk.add(treeFoliage);
 
@@ -198,20 +212,26 @@ var Harvest = (function () {
 			scene.add(sky);*/
 			//weak ambient light
 
-			var page = addPageToScene(3100,10, 3431);
-			var page2 = addPageToScene(-3175, 10, -3319);
-			var page3 = addPageToScene(-3350, 420, -3345);
-			var page4 = addPageToScene(0, 10, -490);
-			var page5 = addPageToScene(120, 10, 120);
-			var page6 = addPageToScene(150, 10, 150);
-			var page7 = addPageToScene(180, 10, 180);
-			var page8 = addPageToScene(210, 10, 210);
-						//add ambient sound lower volume
-						ambientSound.volume = 0.05;
-						//make sure it plays
-						ambientSound.play();
-						//loop the sound
-						ambientSound.loop = true;
+			var page = addPageToScene(2100,10, 2425, "page1.webp");
+			var page2 = addPageToScene(-1895, 10, -2079, "page2.webp");
+			var page3 = addPageToScene(-2070, 420, -2105, "page3.jpeg");
+			var page4 = addPageToScene(0, 10, -490,"page4.jpg");
+			var page5 = addPageToScene(1500, 10, -1498,"page5.webp");
+			var page6 = addPageToScene(-1784, 10, 2039,"page6.jpg");
+			page6.rotation.y = -Math.PI/2;
+			//invert the page on y
+			
+			var page7 = addPageToScene(-1634, 10, 1432,"page7.png");
+			//meter laugh sound
+			page7.rotation.y = -Math.PI/2;
+			var page8 = addPageToScene(-1495, 10, 1740,"page8.webp");
+			page8.rotation.y = -Math.PI/2;
+			//add ambient sound lower volume
+			ambientSound.volume = 0.2;
+			//make sure it plays
+			ambientSound.play();
+			//loop the sound
+			ambientSound.loop = true;
 
 			
 			//make the page disappear when the player interacts with it
@@ -369,7 +389,7 @@ var Harvest = (function () {
 				barn.add(wall5);
 			
 				// Telhado
-				var roofGeometry = new THREE.PlaneGeometry(barnWidth, barnDepth);
+				var roofGeometry = new THREE.BoxGeometry(barnWidth, barnDepth,20);
 				var roofMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('wall_texture.jpg') });
 				var roof = new THREE.Mesh(roofGeometry, roofMaterial);
 				roof.rotation.x = Math.PI / 2;
@@ -382,16 +402,16 @@ var Harvest = (function () {
 				var corridorHeight = 130;
 				var corridorDepth = 500;
 			
-				var corridorGeometry = new THREE.BoxGeometry(corridorWidth, corridorHeight, corridorDepth);
+				var corridorGeometry = new THREE.BoxGeometry(corridorWidth, corridorHeight, barnDepth - 300);
 				var corridor = new THREE.Mesh(corridorGeometry, wallMaterial);
-				corridor.position.set(0, corridorHeight / 3, barnDepth/2 - corridorDepth/2 - 70);
+				corridor.position.set(0, corridorHeight / 3, 70);
 				objects.push(corridor);
 				barn.add(corridor);
 
 				//wall that splits the barn
-				var wall6Geometry = new THREE.BoxGeometry(5, barnHeight, barnDepth);
+				var wall6Geometry = new THREE.BoxGeometry(5, barnHeight, barnDepth-100);
 				var wall6 = new THREE.Mesh(wall6Geometry, wallMaterial);
-				wall6.position.set(0, barnHeight / 3, 100);
+				wall6.position.set(0, barnHeight / 3, 175);
 				objects.push(wall6);
 				barn.add(wall6);
 
@@ -403,7 +423,7 @@ var Harvest = (function () {
 			
 			var barnData = createBarn();
 			var barn = barnData.barn;
-			barn.position.set(3000, 0, 3000);
+			barn.position.set(2000, 0, 2000);
 			objects.push(barn);
 			
 			scene.add(barn);
@@ -504,7 +524,7 @@ var Harvest = (function () {
 			// Ajustar a posição da escada e do conjunto torre de vigia
 			//ROTATE 180 ON Y WITHOUT CHANGING PLACE
 			stairs.rotation.y = Math.PI;
-			stairs.position.set(-totalStepsPerSide * stepWidth / 2-3000, 0, -totalStepsPerSide * stepDepth / 2-3000);
+			stairs.position.set(-totalStepsPerSide * stepWidth / 2-1720, 0, -totalStepsPerSide * stepDepth / 2-1760);
 
 			// Adicionar a torre de vigia à lista de objetos para interações futuras
 			objects.push(stairs);
@@ -596,20 +616,163 @@ var Harvest = (function () {
 			
 			
 			// Posicionar a casafrente tras e lado
-			house.position.set(-3280, 390, -3240);
+			house.position.set(-2000, 390, -2000);
 			house.rotation.y = Math.PI;
 
 			// Adicionar a casa à cena
 			scene.add(house);
 			scene.add(stairs);
 
+
+
 			// Cenario 3
-
- 
+			const boxSize = 75;
+			const maze = [
+				[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1],
+				[1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+				[1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+				[1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+				[1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+				[1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+				[1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+				[1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
+				[1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+				[1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+				
+			];
 			
-
-
 			
+			
+			// Create a single geometry for all blocks
+			const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
+			const material = new THREE.MeshLambertMaterial({map: new THREE.TextureLoader().load('maze.png')});
+			
+			const mazeObject = new THREE.Object3D();
+
+			// Generate maze
+			maze.forEach((row, i) => {
+				row.forEach((cell, j) => {
+					if (cell === 1) {
+						const mesh = new THREE.Mesh(boxGeometry, material);
+						mesh.position.set(j * boxSize - ((maze[0].length * boxSize) / 2), boxSize / 2, i * boxSize - ((maze.length * boxSize) / 2));
+						if ((i === 0 && j === 5) || (i === 10 && j === 7) || (i === 10 && j === 9) || (i === 5 && j === 2)) {
+							// Define panel geometry and material
+							var panelGeometry = new THREE.PlaneGeometry(boxSize, boxSize );
+							
+			
+							// Set position for the panel
+							let panelPositionZ = (i * boxSize - ((maze.length * boxSize) / 2)) + boxSize / 2 + boxSize / 100; // Default offset for panels in z
+							if (i === 10 && j === 9) {
+								// Special case for panel at 10,9 to adjust differently
+								var panelTexture = new THREE.TextureLoader().load('creepy1.jpg');
+							var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
+							//double sided
+							var panel = new THREE.Mesh(panelGeometry, panelMaterial);
+								
+								panel.rotation.y = -Math.PI / 2;
+								panel.position.set((j * boxSize - ((maze[0].length * boxSize) / 2))+boxSize/2-boxSize/100, boxSize / 2, (i * boxSize - ((maze.length * boxSize) / 2))-boxSize);
+							}
+							else if (i === 5 && j === 2) {
+								var panelTexture = new THREE.TextureLoader().load('creepy2.jpg');
+							var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
+							//double sided
+							var panel = new THREE.Mesh(panelGeometry, panelMaterial);
+								// Special case for panel at 5,2 to adjust differently
+								panelPositionZ += (boxSize + boxSize / 100);
+								panel.rotation.y = Math.PI / 2;
+								panel.position.set(((j * boxSize - (((maze[0].length * boxSize) / 2)))+boxSize/2)+boxSize/100, boxSize / 2, (i * boxSize - ((maze.length * boxSize) / 2)));
+							}
+							else if (i === 0 && j === 5) {
+								var panelTexture = new THREE.TextureLoader().load('creepy3.jpg');
+							var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
+							//double sided
+							var panel = new THREE.Mesh(panelGeometry, panelMaterial);
+								// Special case for panel at 0,5 to adjust differently
+								panel.position.set((j * boxSize - ((maze[0].length * boxSize) / 2)), boxSize / 2, ((i * boxSize - ((maze.length * boxSize) / 2)))+ boxSize/2 + boxSize/100);
+							}
+							else if (i === 10 && j === 7) {
+								var panelTexture = new THREE.TextureLoader().load('creepy4.jpg');
+							var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
+							//double sided
+							var panel = new THREE.Mesh(panelGeometry, panelMaterial);
+								panel.rotation.y = Math.PI;
+								// Special case for panel at 10,7 to adjust differently
+								panel.position.set((j * boxSize - ((maze[0].length * boxSize) / 2))+2*boxSize, boxSize / 2, ((i * boxSize - ((maze.length * boxSize) / 2)))- 5*boxSize/2 - boxSize/100);
+							}
+							
+							
+							// Add panel to the object group
+							mazeObject.add(panel);
+							// Add panel to the objects array
+							objects.push(panel);
+						}
+						
+						
+						mazeObject.add(mesh); // Add mesh to the group
+						objects.push(mesh); // Add mesh to the objects array
+					}
+	
+
+				});
+			});
+			
+			// Optionally, set the position of the maze group (if you want to move it to a specific location in the scene)
+			mazeObject.rotation.y = Math.PI;
+			mazeObject.position.set(-1700, -10, 1700);
+			
+			// Add the maze group to the scene
+			scene.add(mazeObject);
+
+			// Cenario 4
+
+			// Materials
+			const material1 = new THREE.MeshLambertMaterial({ color: 0x222222 });
+			const lightMaterial = new THREE.MeshStandardMaterial({ emissive: 0xFFFFFF });
+
+			// Base steps
+			const base = new THREE.Mesh(new THREE.BoxGeometry(10, 2, 10), material1);
+			const step1 = new THREE.Mesh(new THREE.BoxGeometry(8, 2, 8), material1);
+			const step2 = new THREE.Mesh(new THREE.BoxGeometry(6, 2, 6), material1);
+
+			// Position steps
+			step1.position.y = 2;
+			step2.position.y = 4;
+
+			// Main vertical pole
+			const pole = new THREE.Mesh(new THREE.BoxGeometry(3, 100, 3), material1);
+			pole.position.y = 54; // Height of the steps (2+2+2) + half the pole's height (50)
+
+			// Horizontal pole
+			const pole2 = new THREE.Mesh(new THREE.BoxGeometry(20, 3, 3), material1);
+			pole2.position.set(10, 100, 0); // Positioned at the top of the vertical pole
+
+			// Light bulb
+			const lightBulb = new THREE.Mesh(new THREE.SphereGeometry(3, 32, 16), lightMaterial);
+			lightBulb.position.set(20, 100, 0); // At the end of the horizontal pole
+
+			// Point light
+			const pointLight = new THREE.PointLight(0xFFFFFF, 1, 200);
+
+
+			pointLight.position.copy(lightBulb.position); // Match the light bulb's position
+
+
+			// Lamp group
+			const lamp = new THREE.Group();
+			lamp.add(base);
+			lamp.add(step1);
+			lamp.add(step2);
+			lamp.add(pole);
+			lamp.add(pole2);
+			lamp.add(lightBulb);
+			lamp.add(pointLight);
+
+			// Add the lamp to the scene
+
+			lamp.position.set(1500, -10, -1500);
+			lamp.rotation.y = Math.PI;
+			scene.add(lamp);
 
 			camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 5000 );
 			camera.position.y = 10;
@@ -709,13 +872,12 @@ function createStairs() {
 
 	return stairs;
 }
-	var stairs = createStairs();
-	scene.add(stairs);
 
-	function addPageToScene(x,y, z) {
+
+	function addPageToScene(x,y, z, texture) {
 	
 			// white page texture
-			var pageTexture = new THREE.TextureLoader().load('page1.webp');
+			var pageTexture = new THREE.TextureLoader().load(texture);
 			var pageMaterial = new THREE.MeshBasicMaterial({ map: pageTexture });
 			//double sided
 			pageMaterial.side = THREE.DoubleSide;
@@ -752,6 +914,7 @@ function animate() {
 		updatePlayerCoordinates();
 
 	}
+
 	renderer.render( scene, camera );
 
 }
@@ -800,6 +963,8 @@ function initialiseTimer() {
 	
 
 }
+
+
 
 function endGame() {
 	clearInterval(timer);
