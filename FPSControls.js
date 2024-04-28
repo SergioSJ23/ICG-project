@@ -4,7 +4,7 @@
 
 THREE.PointerLockControls = function ( camera, mass, playerHeight, doubleJump, worldObjects ) {
 
-	var footstepSound = new Audio('footsteps.mp3');
+	var footstepSound = new Audio('sounds/footsteps.mp3');
 	var scope = this;
 
 	scope.worldObjects = worldObjects;
