@@ -1,7 +1,6 @@
 
-var Harvest = (function () {
-	
-	
+let Harvest = (function () {
+
     // Instance stores a reference to the Singleton
     var instance;
   
@@ -10,35 +9,21 @@ var Harvest = (function () {
       // Singleton
   
       var camera, scene, renderer;
-      var geometry, material, mesh;
-
-	  let camera2;
 
       var controls;
-      var boxes = [];
       var objects = [];
 	  var spotLight;
-      var WON = false;
       var timer;
 	  var ambientSound = new Audio('ambience.mp3');
 	  var screamSound = new Audio('scream.mp3');
 	  var pageSound = new Audio('page.mp3');
-      
-  
-  
+	  
       init();
       animate();
   
-      var prevTime = performance.now();
-      var velocity = new THREE.Vector3();
-
-	  
-		  
-  
-  
       function init() {
 			
-  
+		
 			initialiseTimer();
 			eventHandlers();
 			scene = new THREE.Scene();
@@ -47,12 +32,9 @@ var Harvest = (function () {
 			screamSound.volume = 1.0;
 			setInterval(function() {
 				screamSound.play();
-			}, 60000);
-
-
+			}, 90000);
 			
 
-	
 			// Floor
 			const geometry = new THREE.PlaneGeometry(5000, 5000, 32);
 			const groundMaterial = new THREE.MeshPhysicalMaterial();
@@ -62,7 +44,7 @@ var Harvest = (function () {
 			plane.position.y = -10; // Posicionar o plano no eixo y
 		
 			
-			plane.material.map = new THREE.TextureLoader().load('ground.jpg');
+			plane.material.map = new THREE.TextureLoader().load('imgs/ground.jpg');
 			plane.material.map.wrapS = THREE.RepeatWrapping;
 			plane.material.map.wrapT = THREE.RepeatWrapping;
 			plane.material.map.repeat.set(100, 100);
@@ -76,16 +58,65 @@ var Harvest = (function () {
 			objects.push(plane);
 			scene.add(plane);
 
+			// Adding panels around the floor to create invisible walls
+			// Define panel geometry and material
+			var panelGeometry = new THREE.PlaneGeometry(5000, 5000);
+			var panelTexture = new THREE.TextureLoader().load('yes.jpg');
+			var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
+			// Double sided
+			var panel = new THREE.Mesh(panelGeometry, panelMaterial);
+			panel.material.side = THREE.DoubleSide; // Make the material double-sided
+
+			// Positioning and adding four walls
+			// Front panel
+			var frontPanel = panel.clone();
+			frontPanel.rotation.x = -Math.PI / 2;
 			
+			frontPanel.position.set(0, 1000, 2490);
 
+			// Right panel
+			var rightPanel = frontPanel.clone();
+			rightPanel.rotation.y = Math.PI / 2;
+			rightPanel.position.set(2490, 1000, 0);
+			
+			objects.push(rightPanel);
 
+			// Back panel new panel
+			var backPanelGeometry = new THREE.PlaneGeometry(5000, 5000);
+			var backPanelTexture = new THREE.TextureLoader().load('yes.jpg');
+			var backPanelMaterial = new THREE.MeshStandardMaterial({ map: backPanelTexture });
+			var backPanel = new THREE.Mesh(backPanelGeometry, backPanelMaterial);
+			//double sided
+			backPanel.material.side = THREE.DoubleSide;
+			objects.push(backPanel);
+			backPanel.position.set(0, 1000, -2490);
+
+			//Front panel
+			var frontPanel2 = backPanel.clone();
+			frontPanel2.position.set(0, 1000, 2490);
+			objects.push(frontPanel2);
+			// Add the panels to the scene
+			scene.add(frontPanel2);
+			scene.add(backPanel);
+
+			// Left panel
+			var leftPanel = rightPanel.clone();
+			leftPanel.rotation.z = -Math.PI / 2;
+			leftPanel.position.set(-2490, 1000, 0);
+			
+			objects.push(leftPanel);
+
+			// Add the panels to the scene
+			scene.add(leftPanel);
+			scene.add(rightPanel);
+			scene.add(backPanel);
 						
 			// Trees
 			
 
-			for (var i = 0; i < 80; i++) {
+			for (var i = 0; i < 60; i++) {
 				var treeTrunkGeometry = new THREE.CylinderGeometry(10, 10, 100, 32);
-				var trunkTexture = new THREE.TextureLoader().load("trunk.jpg");
+				var trunkTexture = new THREE.TextureLoader().load("imgs/trunk.jpg");
 				//standard material
 				var trunkMaterial = new THREE.MeshStandardMaterial({ map: trunkTexture });
 				var treeTrunk = new THREE.Mesh(treeTrunkGeometry, trunkMaterial);
@@ -96,7 +127,7 @@ var Harvest = (function () {
 				var foliageRadius = Math.random() * 40 + 20; // Random radius for the foliage
 
 				var treeFoliageGeometry = new THREE.ConeGeometry(foliageRadius, foliageHeight, 32);
-				var foliageTexture = new THREE.TextureLoader().load("leaves.jpg");
+				var foliageTexture = new THREE.TextureLoader().load("imgs/leaves.jpg");
 				//standard material
 				var foliageMaterial = new THREE.MeshStandardMaterial({ map: foliageTexture });
 
@@ -107,13 +138,10 @@ var Harvest = (function () {
 
 				treeTrunk.add(treeFoliage);
 
-
-
-
 				// Randomize tree position
-				treeTrunk.position.x = Math.floor(Math.random() * 200 - 100) * 20;
+				treeTrunk.position.x = Math.random() * (2600) - 1300;
 				treeTrunk.position.y = 0; // Adjust the y position according to your scene
-				treeTrunk.position.z = Math.floor(Math.random() * 200 - 100) * 20;
+				treeTrunk.position.z = Math.random() * (4000) - 2000;
 
 				//tree makes shadow
 				treeTrunk.castShadow = true;
@@ -129,13 +157,53 @@ var Harvest = (function () {
 				document.getElementById('loading-screen').style.display = 'none';
 			});
 
+			//spawn trees on a different range
 
-			// Load the FBX model
-			
+			for (var i = 0; i < 0; i++) {
+				var treeTrunkGeometry = new THREE.CylinderGeometry(10, 10, 100, 32);
+				var trunkTexture = new THREE.TextureLoader().load("imgs/trunk.jpg");
+				//standard material
+				var trunkMaterial = new THREE.MeshStandardMaterial({ map: trunkTexture });
+				var treeTrunk = new THREE.Mesh(treeTrunkGeometry, trunkMaterial);
+				treeTrunk.castShadow = true; //default is false
+				treeTrunk.receiveShadow = false; //default
+				// Randomize foliage size
+				var foliageHeight = Math.random() * 100 + 100; // Random height for the foliage
+				var foliageRadius = Math.random() * 40 + 20; // Random radius for the foliage
+
+				var treeFoliageGeometry = new THREE.ConeGeometry(foliageRadius, foliageHeight, 32);
+				var foliageTexture = new THREE.TextureLoader().load("imgs/leaves.jpg");
+				//standard material
+				var foliageMaterial = new THREE.MeshStandardMaterial({ map: foliageTexture });
+
+				var treeFoliage = new THREE.Mesh(treeFoliageGeometry, foliageMaterial);
+				treeFoliage.position.y = 50 + foliageHeight / 2;
+				treeFoliage.castShadow = true;
+				treeFoliage.receiveShadow = false;
+
+				treeTrunk.add(treeFoliage);
+
+				// Randomize tree position
+				treeTrunk.position.x = Math.random() * (4000) - 2000;
+				treeTrunk.position.y = 0; // Adjust the y position according to your scene
+				treeTrunk.position.z = Math.random() * (2000) - 1000;
+
+				//tree makes shadow
+				treeTrunk.castShadow = true;
+				treeTrunk.receiveShadow = false;
+
+				scene.add(treeTrunk);
+				objects.push(treeTrunk);
+				objects.push(treeFoliage);
+			}
+			window.addEventListener('load', function() {
+				document.getElementById('loading-screen').style.display = 'none';
+			});
+
 
 			//make a static tree
 			var treeTrunkGeometry = new THREE.CylinderGeometry(10, 10, 100, 32);
-			var trunkTexture = new THREE.TextureLoader().load("trunk.jpg");
+			var trunkTexture = new THREE.TextureLoader().load("imgs/trunk.jpg");
 			//standard material
 			var trunkMaterial = new THREE.MeshStandardMaterial({ map: trunkTexture });
 			var treeTrunk = new THREE.Mesh(treeTrunkGeometry, trunkMaterial);
@@ -147,7 +215,7 @@ var Harvest = (function () {
 			var foliageRadius = 50; // Random radius for the foliage
 
 			var treeFoliageGeometry = new THREE.ConeGeometry(foliageRadius, foliageHeight, 32);
-			var foliageTexture = new THREE.TextureLoader().load("leaves.jpg");
+			var foliageTexture = new THREE.TextureLoader().load("imgs/leaves.jpg");
 			//standard material
 			var foliageMaterial = new THREE.MeshStandardMaterial({ map: foliageTexture });
 
@@ -169,7 +237,7 @@ var Harvest = (function () {
 			//background color
 			scene.background = new THREE.Color(0x000000);
 
-			var moonTexture = new THREE.TextureLoader().load('moon.png'); // Carregar a textura da lua
+			var moonTexture = new THREE.TextureLoader().load('imgs/moon.png'); // Carregar a textura da lua
 			var moonMaterial = new THREE.MeshBasicMaterial({ map: moonTexture, side: THREE.FrontSide }); // Material usando a textura da lua
 			var moonGeometry = new THREE.SphereGeometry(100, 64, 64); // Geometria esférica para a lua
 			var moon = new THREE.Mesh(moonGeometry, moonMaterial); // Criar o objeto da lua
@@ -180,56 +248,25 @@ var Harvest = (function () {
 			var ambientLight = new THREE.AmbientLight(0x404040, 0.051);
 			scene.add(ambientLight);
 
-			/*//add skybox that covers panel
-			var skyboxGeometry = new THREE.BoxGeometry(18000, 18000, 18000);
-			//WITH IMAGES AS TEXTURES
-			var cubeMaterials = [
-				new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('space_ft.png'), side: THREE.DoubleSide }), // right
-				new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('space_bk.png'), side: THREE.DoubleSide }), // left
-				new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('space_up.png'), side: THREE.DoubleSide }), // top
-				new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('space_dn.png'), side: THREE.DoubleSide }), // bottom
-				new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('space_rt.png'), side: THREE.DoubleSide }), // front
-				new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('space_lf.png'), side: THREE.DoubleSide })  // back
-			];
-			var skyboxMaterial = new THREE.MeshFaceMaterial(cubeMaterials);
-			var skybox = new THREE.Mesh(skyboxGeometry, skyboxMaterial);
-			scene.add(skybox);*/
-
-			//sphere that cobvers the panel
-			/*var skyGeometry = new THREE.SphereGeometry(18000, 32, 32);
-			var skyMaterial = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('night.jpg')});
-			
-			var sky = new THREE.Mesh(skyGeometry, skyMaterial);
-			sky.material.map.wrapS = THREE.RepeatWrapping;
-			sky.material.map.wrapT = THREE.RepeatWrapping;
-			sky.material.map.repeat.set(1000, 1000);
-			sky.material.map.anisotropy = 160;
-			
-			
-
-			
-			sky.material.side = THREE.BackSide;
-			scene.add(sky);*/
-			//weak ambient light
-
-			var page = addPageToScene(2100,10, 2425, "page1.webp");
-			var page2 = addPageToScene(-1895, 10, -2079, "page2.webp");
-			var page3 = addPageToScene(-2070, 420, -2105, "page3.jpeg");
-			var page4 = addPageToScene(0, 10, -490,"page4.jpg");
-			var page5 = addPageToScene(1500, 10, -1498,"page5.webp");
-			var page6 = addPageToScene(-1784, 10, 2039,"page6.jpg");
+			var page = addPageToScene(2100,10, 2425, "imgs/page1.webp");
+			var page2 = addPageToScene(-1895, 10, -2079, "imgs/page2.webp");
+			var page3 = addPageToScene(-2070, 420, -2105, "imgs/page3.jpeg");
+			var page4 = addPageToScene(0, 10, -490,"imgs/page4.jpg");
+			var page5 = addPageToScene(1500, 10, -1498,"imgs/page5.webp");
+			var page6 = addPageToScene(-1784, 10, 2039,"imgs/page6.jpg");
 			page6.rotation.y = -Math.PI/2;
 			//invert the page on y
 			
-			var page7 = addPageToScene(-1634, 10, 1432,"page7.png");
+			var page7 = addPageToScene(-1634, 10, 1432,"imgs/page7.png");
 			//meter laugh sound
 			page7.rotation.y = -Math.PI/2;
-			var page8 = addPageToScene(-1495, 10, 1740,"page8.webp");
+			var page8 = addPageToScene(-1495, 10, 1740,"imgs/page8.webp");
 			page8.rotation.y = -Math.PI/2;
 			//add ambient sound lower volume
-			ambientSound.volume = 0.2;
+			ambientSound.volume = 0.8;
 			//make sure it plays
-			ambientSound.play();
+		
+			
 			//loop the sound
 			ambientSound.loop = true;
 
@@ -244,10 +281,6 @@ var Harvest = (function () {
 
 			createStairs();
 			
-
-
-
-
 			window.addEventListener('click', function() {
 				clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 				clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -340,10 +373,7 @@ var Harvest = (function () {
 				//wait 6 secs the call endGame function
 				setTimeout(endGame, 300000);
 
-
 			});
-
-			
 
 			//cenário 1
 
@@ -355,7 +385,7 @@ var Harvest = (function () {
 				var barnHeight = 150;
 				var barnDepth = 1000;
 			
-				var wallTexture = new THREE.TextureLoader().load('wall_texture.jpg');
+				var wallTexture = new THREE.TextureLoader().load('imgs/wall_texture.jpg');
 				var wallMaterial = new THREE.MeshStandardMaterial({ map: wallTexture });
 			
 				// Paredes
@@ -390,7 +420,7 @@ var Harvest = (function () {
 			
 				// Telhado
 				var roofGeometry = new THREE.BoxGeometry(barnWidth, barnDepth,20);
-				var roofMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('wall_texture.jpg') });
+				var roofMaterial = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load('imgs/wall_texture.jpg') });
 				var roof = new THREE.Mesh(roofGeometry, roofMaterial);
 				roof.rotation.x = Math.PI / 2;
 				roof.position.y = barnHeight - 25;
@@ -443,7 +473,7 @@ var Harvest = (function () {
 			  for (let i = 0; i < totalStepsPerSide; i++) {
 
 				const stepGeometry = new THREE.BoxGeometry(stepWidth, stepHeight, stepDepth);
-				const stepTexture = new THREE.TextureLoader().load('wood2.jpg');
+				const stepTexture = new THREE.TextureLoader().load('imgs/wood2.jpg');
 				const stepMaterial = new THREE.MeshLambertMaterial({ map: stepTexture});
 				const step = new THREE.Mesh(stepGeometry, stepMaterial);
 				objects.push(step);
@@ -508,7 +538,7 @@ var Harvest = (function () {
 			// Criar as pernas
 			for (let i = 0; i < 4; i++) {
 			const legGeometry = new THREE.BoxGeometry(legWidth, legHeight, legDepth);
-			const legtexture = new THREE.TextureLoader().load('wood.jpg');
+			const legtexture = new THREE.TextureLoader().load('imgs/wood.jpg');
 			const legMaterial = new THREE.MeshLambertMaterial({ map: legtexture});
 			const leg = new THREE.Mesh(legGeometry, legMaterial);
 
@@ -535,19 +565,19 @@ var Harvest = (function () {
 
 			// Parâmetros da casa
 			var houseWidth = 230;
-			var houseHeight = 200;
+			var houseHeight = 150;
 			var houseDepth = 230;
 
 			// Texturas e materiais
-			var wallTexture = new THREE.TextureLoader().load('watchtower.jpg');
+			var wallTexture = new THREE.TextureLoader().load('imgs/watchtower.png');
 			var wallMaterial = new THREE.MeshStandardMaterial({ map: wallTexture });
-			var floorTexture = new THREE.TextureLoader().load('floor.jpg');
+			var floorTexture = new THREE.TextureLoader().load('imgs/floor.jpg');
 			var floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
 
 			// Paredes
 			var wall1Geometry = new THREE.BoxGeometry(houseWidth, houseHeight, 10);
 			var wall1 = new THREE.Mesh(wall1Geometry, wallMaterial);
-			wall1.position.set(0, houseHeight / 2, houseDepth / 2+2);
+			wall1.position.set(0, houseHeight / 2, houseDepth / 2-5);
 			objects.push(wall1);
 			house.add(wall1);
 
@@ -568,15 +598,15 @@ var Harvest = (function () {
 			house.add(wall3);
 
 			//wall4 on top and between the two walls	
-			var wall4Geometry = new THREE.BoxGeometry(10, houseHeight/3, 60);
+			var wall4Geometry = new THREE.BoxGeometry(9, houseHeight/3, 60);
 			var wall4 = new THREE.Mesh(wall4Geometry, wallMaterial);
-			wall4.position.set(-houseWidth / 2, houseHeight-33, -52);
+			wall4.position.set(-houseWidth / 2, houseHeight-24, -52);
 			objects.push(wall4);
 			house.add(wall4);
 
 			//clone wall 1
 			var wall5 = wall1.clone();
-			wall5.position.set(0, houseHeight / 2, -houseDepth / 2);
+			wall5.position.set(0, houseHeight / 2, -houseDepth / 2+4);
 			objects.push(wall5);
 			house.add(wall5);
 
@@ -588,10 +618,10 @@ var Harvest = (function () {
 
 			// Chão
 			var floorGeometry = new THREE.BoxGeometry(houseWidth, 10, houseDepth);
-			var floorTexture = new THREE.TextureLoader().load('floor.jpg');
+			var floorTexture = new THREE.TextureLoader().load('imgs/watchtower.png');
 			var floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
 			var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-			floor.position.set(0, 5, 0); // Eleva levemente o chão para evitar z-fighting
+			floor.position.set(0, 4, 0); // Eleva levemente o chão para evitar z-fighting
 			objects.push(floor);
 			house.add(floor);
 
@@ -605,7 +635,7 @@ var Harvest = (function () {
 			house.add(roof);
 
 			// Paredes internas com espaço para porta
-			var wallInteriorGeometry = new THREE.BoxGeometry(10, houseHeight, (houseDepth - doorWidth) / 2 +10);
+			var wallInteriorGeometry = new THREE.BoxGeometry(10, houseHeight, (houseDepth - doorWidth) / 2 );
 			var wallInterior1 = new THREE.Mesh(wallInteriorGeometry, wallMaterial);
 			wallInterior1.position.set(0, houseHeight / 2, doorWidth);
 			house.add(wallInterior1);
@@ -622,8 +652,6 @@ var Harvest = (function () {
 			// Adicionar a casa à cena
 			scene.add(house);
 			scene.add(stairs);
-
-
 
 			// Cenario 3
 			const boxSize = 75;
@@ -646,7 +674,7 @@ var Harvest = (function () {
 			
 			// Create a single geometry for all blocks
 			const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-			const material = new THREE.MeshLambertMaterial({map: new THREE.TextureLoader().load('maze.png')});
+			const material = new THREE.MeshLambertMaterial({map: new THREE.TextureLoader().load('imgs/maze.png')});
 			
 			const mazeObject = new THREE.Object3D();
 
@@ -665,7 +693,7 @@ var Harvest = (function () {
 							let panelPositionZ = (i * boxSize - ((maze.length * boxSize) / 2)) + boxSize / 2 + boxSize / 100; // Default offset for panels in z
 							if (i === 10 && j === 9) {
 								// Special case for panel at 10,9 to adjust differently
-								var panelTexture = new THREE.TextureLoader().load('creepy1.jpg');
+								var panelTexture = new THREE.TextureLoader().load('imgs/creepy1.jpg');
 							var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
 							//double sided
 							var panel = new THREE.Mesh(panelGeometry, panelMaterial);
@@ -674,7 +702,7 @@ var Harvest = (function () {
 								panel.position.set((j * boxSize - ((maze[0].length * boxSize) / 2))+boxSize/2-boxSize/100, boxSize / 2, (i * boxSize - ((maze.length * boxSize) / 2))-boxSize);
 							}
 							else if (i === 5 && j === 2) {
-								var panelTexture = new THREE.TextureLoader().load('creepy2.jpg');
+								var panelTexture = new THREE.TextureLoader().load('imgs/creepy2.jpg');
 							var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
 							//double sided
 							var panel = new THREE.Mesh(panelGeometry, panelMaterial);
@@ -684,7 +712,7 @@ var Harvest = (function () {
 								panel.position.set(((j * boxSize - (((maze[0].length * boxSize) / 2)))+boxSize/2)+boxSize/100, boxSize / 2, (i * boxSize - ((maze.length * boxSize) / 2)));
 							}
 							else if (i === 0 && j === 5) {
-								var panelTexture = new THREE.TextureLoader().load('creepy3.jpg');
+								var panelTexture = new THREE.TextureLoader().load('imgs/creepy3.jpg');
 							var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
 							//double sided
 							var panel = new THREE.Mesh(panelGeometry, panelMaterial);
@@ -692,7 +720,7 @@ var Harvest = (function () {
 								panel.position.set((j * boxSize - ((maze[0].length * boxSize) / 2)), boxSize / 2, ((i * boxSize - ((maze.length * boxSize) / 2)))+ boxSize/2 + boxSize/100);
 							}
 							else if (i === 10 && j === 7) {
-								var panelTexture = new THREE.TextureLoader().load('creepy4.jpg');
+								var panelTexture = new THREE.TextureLoader().load('imgs/creepy4.jpg');
 							var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
 							//double sided
 							var panel = new THREE.Mesh(panelGeometry, panelMaterial);
@@ -712,8 +740,6 @@ var Harvest = (function () {
 						mazeObject.add(mesh); // Add mesh to the group
 						objects.push(mesh); // Add mesh to the objects array
 					}
-	
-
 				});
 			});
 			
@@ -810,9 +836,6 @@ var Harvest = (function () {
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			ScreenOverlay(controls); //
 			document.body.appendChild( renderer.domElement );
-
-			
-  
       }
 	  
 
@@ -824,54 +847,52 @@ var Harvest = (function () {
 			return obj !== pagina;
 		});
 	}
+	
+	//stairs 
+	function createStairs() {
+		var stairs = new THREE.Group();
+		var stairWidth = 100;
+		var stairHeight = 10;
+		var stairDepth = 50;
+		var stairTexture = new THREE.TextureLoader().load('imgs/wall_texture.jpg');
+		var stairMaterial = new THREE.MeshStandardMaterial({ map: stairTexture });
 
+		for (var i = 0; i < 10; i++) {
+			var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
+			var stair = new THREE.Mesh(stairGeometry, stairMaterial);
+			stair.position.set(0, i * stairHeight, i * stairDepth);
+			stairs.add(stair);
+			objects.push(stair);
+		}
 
+		for (var i = 0; i < 10; i++) {
+			var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
+			var stair = new THREE.Mesh(stairGeometry, stairMaterial);
+			stair.position.set(i * stairWidth, i * stairHeight, 10 * stairDepth);
+			stairs.add(stair);
+			objects.push(stair);
+		}
 
-//make stairs that go up in a square shape
-function createStairs() {
-	var stairs = new THREE.Group();
-	var stairWidth = 100;
-	var stairHeight = 10;
-	var stairDepth = 50;
-	var stairTexture = new THREE.TextureLoader().load('wall_texture.jpg');
-	var stairMaterial = new THREE.MeshStandardMaterial({ map: stairTexture });
+		for (var i = 0; i < 10; i++) {
+			var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
+			var stair = new THREE.Mesh(stairGeometry, stairMaterial);
+			stair.position.set(10 * stairWidth, i * stairHeight, 10 * stairDepth - i * stairDepth);
+			stairs.add(stair);
+			objects.push(stair);
+		}
 
-	for (var i = 0; i < 10; i++) {
-		var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
-		var stair = new THREE.Mesh(stairGeometry, stairMaterial);
-		stair.position.set(0, i * stairHeight, i * stairDepth);
-		stairs.add(stair);
-		objects.push(stair);
+		for (var i = 0; i < 10; i++) {
+			var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
+			var stair = new THREE.Mesh(stairGeometry, stairMaterial);
+			stair.position.set(10 * stairWidth - i * stairWidth, i * stairHeight, 0);
+			stairs.add(stair);
+			objects.push(stair);
+
+		}
+		stairs.position.set(3000, 0, -3000);
+
+		return stairs;
 	}
-
-	for (var i = 0; i < 10; i++) {
-		var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
-		var stair = new THREE.Mesh(stairGeometry, stairMaterial);
-		stair.position.set(i * stairWidth, i * stairHeight, 10 * stairDepth);
-		stairs.add(stair);
-		objects.push(stair);
-	}
-
-	for (var i = 0; i < 10; i++) {
-		var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
-		var stair = new THREE.Mesh(stairGeometry, stairMaterial);
-		stair.position.set(10 * stairWidth, i * stairHeight, 10 * stairDepth - i * stairDepth);
-		stairs.add(stair);
-		objects.push(stair);
-	}
-
-	for (var i = 0; i < 10; i++) {
-		var stairGeometry = new THREE.BoxGeometry(stairWidth, stairHeight, stairDepth);
-		var stair = new THREE.Mesh(stairGeometry, stairMaterial);
-		stair.position.set(10 * stairWidth - i * stairWidth, i * stairHeight, 0);
-		stairs.add(stair);
-		objects.push(stair);
-
-	}
-	stairs.position.set(3000, 0, -3000);
-
-	return stairs;
-}
 
 
 	function addPageToScene(x,y, z, texture) {
@@ -899,182 +920,166 @@ function createStairs() {
 			return page;
 	}
 
-
-
+	function animate() {
 	
+		requestAnimationFrame( animate );
+		if ( controls.enabled ) {
 
+			controls.updateControls();
+			updatePlayerCoordinates();
 
-function animate() {
-  
-	requestAnimationFrame( animate );
-
-	if ( controls.enabled ) {
-
-		controls.updateControls();
-		updatePlayerCoordinates();
-
+		}
+		renderer.render( scene, camera );
 	}
 
-	renderer.render( scene, camera );
+	function updatePlayerCoordinates() {
+		if (controls && controls.getPlayer()) {
+			var playerPosition = controls.getPlayer().position; // Assume que controls.getPlayer() retorna o objeto THREE.Mesh ou similar do jogador
+			var coordsText = `Coordenadas: X=${playerPosition.x.toFixed(2)}, Y=${playerPosition.y.toFixed(2)}, Z=${playerPosition.z.toFixed(2)}`;
+			document.getElementById('playerCoords').innerText = coordsText;
+		}
+		ambientSound.play();
+	}
 
-}
+	function checkPageCounter(counterPage) {
+		if (counterPage === 8) {
+			WON = true;
+			clearInterval(timer);
+			document.getElementById("game-over").style.display = "block";
+			document.getElementById("game-over").innerHTML = "Parabéns! Coletaste todas as páginas! <br> Tempo: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Voltando ao menu inicial em 20 segundos...";
+			var countDown = 20;
+			var countDownTimer = setInterval(function() {
+				countDown--;
+				document.getElementById("game-over").innerHTML = "Parabéns! Coletaste todas as páginas! <br> Tempo: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Voltando ao menu inicial em " + countDown + " segundos...";
+				if (countDown <= 0) {
+					clearInterval(countDownTimer);
+					window.location.href = "index.html";
+				}
+			}, 1000);
+			setTimeout(reloadPage, 20000);
+		}
+	}
+	
 
-function updatePlayerCoordinates() {
-    if (controls && controls.getPlayer()) {
-        var playerPosition = controls.getPlayer().position; // Assume que controls.getPlayer() retorna o objeto THREE.Mesh ou similar do jogador
-        var coordsText = `Coordenadas: X=${playerPosition.x.toFixed(2)}, Y=${playerPosition.y.toFixed(2)}, Z=${playerPosition.z.toFixed(2)}`;
-        document.getElementById('playerCoords').innerText = coordsText;
-    }
-}
+	function initialiseTimer() {
+		var sec = 0;
+		function pad ( val ) { return val > 9 ? val : "0" + val; }
 
-function checkPageCounter(counterPage) {
-	if (counterPage === 8) {
-		WON = true;
+		timer = setInterval( function(){
+			document.getElementById("seconds").innerHTML = String(pad(++sec%60));
+			document.getElementById("minutes").innerHTML = String(pad(parseInt(sec/60,10)));
+		}, 1000);
+	}
+
+	function endGame() {
 		clearInterval(timer);
 		document.getElementById("game-over").style.display = "block";
-		document.getElementById("game-over").innerHTML = "Parabéns! Coletaste todas as páginas! <br> Tempo: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Voltando ao menu inicial em 20 segundos...";
+		document.getElementById("game-over").innerHTML = "Game Over! <br> Voltando ao menu inicial em 20 segundos...";
 		var countDown = 20;
 		var countDownTimer = setInterval(function() {
 			countDown--;
-			document.getElementById("game-over").innerHTML = "Parabéns! Coletaste todas as páginas! <br> Tempo: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Voltando ao menu inicial em " + countDown + " segundos...";
+			document.getElementById("game-over").innerHTML = "Game Over! <br> Voltando ao menu inicial em " + countDown + " segundos...";
 			if (countDown <= 0) {
 				clearInterval(countDownTimer);
 				window.location.href = "index.html";
 			}
 		}, 1000);
 		setTimeout(reloadPage, 20000);
-		
+	}
+
+	function eventHandlers() {
+
+		// Keyboard press handlers
+		var onKeyDown = function ( event ) { event.preventDefault(); event.stopPropagation(); handleKeyInteraction(event.keyCode, true); };
+		var onKeyUp = function ( event ) { event.preventDefault(); event.stopPropagation(); handleKeyInteraction(event.keyCode, false); };
+		document.addEventListener( 'keydown', onKeyDown, false );
+		document.addEventListener( 'keyup', onKeyUp, false );
+
+		// Resize Event
+		window.addEventListener( 'resize', onWindowResize, false );
+	}
+
+	// HANDLE KEY INTERACTION
+	function handleKeyInteraction(keyCode, boolean) {
+		var isKeyDown = boolean;
+
+		switch(keyCode) {
+			case 38: // up
+			case 87: // w
+				controls.movements.forward = boolean;
+				break;
+
+			case 40: // down
+			case 83: // s
+				controls.movements.backward = boolean;
+				break;
+
+			case 37: // left
+			case 65: // a
+				controls.movements.left = boolean;
+				break;
+
+			case 39: // right
+			case 68: // d
+				controls.movements.right = boolean;
+				break;
+
+			case 32: // space
+				if (!isKeyDown) {
+					controls.jump();
+				}
+				break;
+
+			case 16: // shift
+				controls.run(boolean);
+				break;
+
+			case 67: // crouch (CTRL + W etc destroys tab in Chrome!)
+				controls.crouch(boolean);
+
+			//press E to interact with objects
+			case 69:
+				controls.interact();
+				break;
+
+		}
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
 
 	}
-}
-  
-function randomTexture(maxTextures) {
-	return Math.floor(Math.random() * maxTextures) + 1;
-}
-
-function initialiseTimer() {
-	var sec = 0;
-	function pad ( val ) { return val > 9 ? val : "0" + val; }
-
-	timer = setInterval( function(){
-		document.getElementById("seconds").innerHTML = String(pad(++sec%60));
-		document.getElementById("minutes").innerHTML = String(pad(parseInt(sec/60,10)));
-	}, 1000);
-	
-
-}
 
 
-
-function endGame() {
-	clearInterval(timer);
-	document.getElementById("game-over").style.display = "block";
-	document.getElementById("game-over").innerHTML = "Game Over! <br> Voltando ao menu inicial em 20 segundos...";
-	var countDown = 20;
-	var countDownTimer = setInterval(function() {
-		countDown--;
-		document.getElementById("game-over").innerHTML = "Game Over! <br> Voltando ao menu inicial em " + countDown + " segundos...";
-		if (countDown <= 0) {
-			clearInterval(countDownTimer);
-			window.location.href = "index.html";
-		}
-	}, 1000);
-	setTimeout(reloadPage, 20000);
-}
-
-function eventHandlers() {
-
-	// Keyboard press handlers
-	var onKeyDown = function ( event ) { event.preventDefault(); event.stopPropagation(); handleKeyInteraction(event.keyCode, true); };
-	var onKeyUp = function ( event ) { event.preventDefault(); event.stopPropagation(); handleKeyInteraction(event.keyCode, false); };
-	document.addEventListener( 'keydown', onKeyDown, false );
-	document.addEventListener( 'keyup', onKeyUp, false );
-
-	// Resize Event
-	window.addEventListener( 'resize', onWindowResize, false );
-}
-
-// HANDLE KEY INTERACTION
-function handleKeyInteraction(keyCode, boolean) {
-	var isKeyDown = boolean;
-
-	switch(keyCode) {
-		case 38: // up
-		case 87: // w
-			controls.movements.forward = boolean;
-			break;
-
-		case 40: // down
-		case 83: // s
-			controls.movements.backward = boolean;
-			break;
-
-		case 37: // left
-		case 65: // a
-			controls.movements.left = boolean;
-			break;
-
-		case 39: // right
-		case 68: // d
-			controls.movements.right = boolean;
-			break;
-
-		case 32: // space
-			if (!isKeyDown) {
-				controls.jump();
+	return {
+		// Public methods and variables
+			
+			setJumpFactor: function (setJumpFactor) {
+				jumpFactor = setJumpFactor;
 			}
-			break;
 
-		case 16: // shift
-			controls.run(boolean);
-			break;
+		};
 
-		case 67: // crouch (CTRL + W etc destroys tab in Chrome!)
-			controls.crouch(boolean);
+		};
 
-		//press E to interact with objects
-		case 69:
-			controls.interact();
-			break;
+	return {
 
-	}
-}
+	// Get the Singleton instance if one exists
+	// or create one if it doesn't
+	getInstance: function () {
 
-function onWindowResize() {
-
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
-
-	renderer.setSize( window.innerWidth, window.innerHeight );
-
-}
-
-
-return {
-	// Public methods and variables
-		
-		setJumpFactor: function (setJumpFactor) {
-			jumpFactor = setJumpFactor;
+		if ( !instance ) {
+			instance = startGame();
 		}
 
-	};
+		return instance;
+			}
 
-	};
-
-return {
-
-// Get the Singleton instance if one exists
-// or create one if it doesn't
-getInstance: function () {
-
-	if ( !instance ) {
-		instance = startGame();
-	}
-
-	return instance;
-		}
-
-	};
+		};
 
 })();
 
