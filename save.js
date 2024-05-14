@@ -13,14 +13,14 @@ function startGame() {
     var scream = new Audio('sounds/jumpscare.mp3');
     var warningSound = new Audio('sounds/leave.mp3');
     var final = new Audio('sounds/final.mp3');
-	var isGameActive = false;
-  
     
     init();
     animate();
     
     function init() {
-         
+            
+        
+            initialiseTimer();
             eventHandlers();
             scene = new THREE.Scene();
             
@@ -32,21 +32,9 @@ function startGame() {
     
             ambientSound.volume = 0.3;
             final.volume = 0.8;
-
-			document.addEventListener('click', function activateGame() {
-				if (!isGameActive) {  // Se o jogo estiver inativo, ativa no primeiro clique
-					isGameActive = true;
-					console.log("Jogo ativado.");
-					// Remova o ouvinte de evento para garantir que isso aconteça apenas uma vez
-					document.removeEventListener('click', activateGame);
-					// Chame initialiseTimer para iniciar o timer
-					initialiseTimer();
-                    setTimeout(endGame, 300000);
-                    
-                    
-				}
-			});
-
+            
+            
+    
             // Floor
             const geometry = new THREE.PlaneGeometry(5000, 5000, 32);
             const groundMaterial = new THREE.MeshPhysicalMaterial();
@@ -59,38 +47,23 @@ function startGame() {
             plane.material.map = new THREE.TextureLoader().load('imgs/ground.jpg');
             plane.material.map.wrapS = THREE.RepeatWrapping;
             plane.material.map.wrapT = THREE.RepeatWrapping;
-            plane.material.map.repeat.set(30, 30);
+            plane.material.map.repeat.set(100, 100);
             plane.material.map.anisotropy = 16;
             
             plane.material.map.minFilter = THREE.LinearFilter;
             plane.material.map.magFilter = THREE.LinearFilter;
             plane.receiveShadow = true;
-			
     
     
             objects.push(plane);
             scene.add(plane);
-             // Define the URLs for the skybox images
-            var urls = [
-                'imgs/xpos.png',  // Right side
-                'imgs/xneg.png',  // Left side
-                'imgs/ypos.png',  // Top side
-                'imgs/yneg.png',  // Bottom side
-                'imgs/zpos.png',  // Front side
-                'imgs/zneg.png',  // Back side
-            ];
-
-            createSkybox(urls);
     
             // Adding panels around the floor to create invisible walls
             // Define panel geometry and material
             var panelGeometry = new THREE.PlaneGeometry(5000, 5000);
-            var panelMaterial = new THREE.MeshStandardMaterial({
-                map: new THREE.TextureLoader().load('yes.jpg'),
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.5
-            });
+            var panelTexture = new THREE.TextureLoader().load('yes.jpg');
+            var panelMaterial = new THREE.MeshStandardMaterial({ map: panelTexture });
+            // Double sided
             var panel = new THREE.Mesh(panelGeometry, panelMaterial);
             panel.material.side = THREE.DoubleSide; // Make the material double-sided
     
@@ -110,12 +83,8 @@ function startGame() {
     
             // Back panel new panel
             var backPanelGeometry = new THREE.PlaneGeometry(5000, 5000);
-            var backPanelMaterial = new THREE.MeshStandardMaterial({
-                map: new THREE.TextureLoader().load('yes.jpg'),
-                side: THREE.DoubleSide,
-                transparent: true,
-                opacity: 0.5
-            });
+            var backPanelTexture = new THREE.TextureLoader().load('yes.jpg');
+            var backPanelMaterial = new THREE.MeshStandardMaterial({ map: backPanelTexture });
             var backPanel = new THREE.Mesh(backPanelGeometry, backPanelMaterial);
             //double sided
             backPanel.material.side = THREE.DoubleSide;
@@ -272,9 +241,9 @@ function startGame() {
     
             var moonTexture = new THREE.TextureLoader().load('imgs/moon.png'); // Carregar a textura da lua
             var moonMaterial = new THREE.MeshBasicMaterial({ map: moonTexture, side: THREE.FrontSide }); // Material usando a textura da lua
-            var moonGeometry = new THREE.SphereGeometry(200, 64, 64); // Geometria esférica para a lua
+            var moonGeometry = new THREE.SphereGeometry(100, 64, 64); // Geometria esférica para a lua
             var moon = new THREE.Mesh(moonGeometry, moonMaterial); // Criar o objeto da lua
-            moon.position.set(0, 3000, 4000); // Posicionar a lua no céu
+            moon.position.set(0, 6000, 8000); // Posicionar a lua no céu
             scene.add(moon); // Adicionar a lua à cena
     
             //video on panel
@@ -305,67 +274,13 @@ function startGame() {
             scene.add(videoScreen);
     
     
-            const textureLoader = new THREE.TextureLoader();
-            const colorMap = textureLoader.load('imgs/head.png');
-            const bumpMap = textureLoader.load('imgs/head.png');
+            //sacry sound
+    
             
-            // Create head geometry and material
-            const headGeometry = new THREE.SphereGeometry(2.5, 100, 100);
-            headGeometry.scale(0.8, 1.0, 0.7); // Adjust head shape
-            const headMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                map: colorMap,
-                bumpMap: bumpMap,
-                bumpScale: 0.00001,
-                reflectivity: 0.1,
-                shininess: 0
-            });
-            const head = new THREE.Mesh(headGeometry, headMaterial);
+    
+    
             
-            // Create body geometry and material
-            const bodyGeometry = new THREE.BoxGeometry(4, 15, 3);
-            const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            
-            // Create arms
-            const armGeometry = new THREE.BoxGeometry(0.75, 15, 0.75);
-            const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
-            const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
-            leftArm.position.set(-3, 0, 0); // Position relative to body center
-            rightArm.position.set(3, 0, 0);
-            
-            // Create legs
-            const legGeometry = new THREE.BoxGeometry(1.5, 20, 1.5);
-            const leftLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-            const rightLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-            leftLeg.position.set(-1, -10, 0); // Position relative to body center
-            rightLeg.position.set(1, -10, 0);
-            
-            // Group all parts together
-            const slenderMan = new THREE.Group();
-            slenderMan.add(head);
-            slenderMan.add(body);
-            slenderMan.add(leftArm);
-            slenderMan.add(rightArm);
-            slenderMan.add(leftLeg);
-            slenderMan.add(rightLeg);
-            
-            // Adjust positions relative to the group center
-            head.position.set(0, 27.5, 0);
-            head.scale.set(1.5, 1.5, 1.5);
-            head.rotation.y = Math.PI / 2;
-            body.position.set(0, 7.5, 0);
-            
-            // Adjust the scale for the entire model
-            slenderMan.scale.set(2, 2, 2);
-            slenderMan.position.set(0, 100, 0);
-            
-            // Add the group to the scene
-            scene.add(slenderMan);
-            
-            
-
-
+    
             //weak ambient light
             var ambientLight = new THREE.AmbientLight(0x404040, 0.051);
             scene.add(ambientLight);
@@ -385,7 +300,9 @@ function startGame() {
             page7.rotation.y = -Math.PI/2;
             var page8 = addPageToScene(-1495, 10, 1740,"imgs/page8.webp");
             page8.rotation.y = -Math.PI/2;
-
+            //add ambient sound lower volume
+            
+            //make sure it plays
         
             
             //loop the sound
@@ -410,7 +327,7 @@ function startGame() {
                 if (intersects.length > 0) {
                     if (intersects[0].object === page) {
                         counterPage++;
-                        elementoContagem.innerHTML = "Pages found: "+counterPage;
+                        elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
                         pageSound.play();
                         
                         removerPaginaDoMapa(page);
@@ -422,49 +339,49 @@ function startGame() {
                     }
                     if (intersects[0].object === page2) {
                         counterPage++;
-                        elementoContagem.innerHTML = "Pages found: "+counterPage;
+                        elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
                         pageSound.play();
                         removerPaginaDoMapa(page2);
                         checkPageCounter(counterPage);
                     }
                     if (intersects[0].object === page3) {
                         counterPage++;
-                        elementoContagem.innerHTML = "Pages found: "+counterPage;
+                        elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
                         pageSound.play();
                         removerPaginaDoMapa(page3);
                         checkPageCounter(counterPage);
                     }
                     if (intersects[0].object === page4) {
                         counterPage++;
-                        elementoContagem.innerHTML = "Pages found: "+counterPage;
+                        elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
                         pageSound.play();
                         removerPaginaDoMapa(page4);
                         checkPageCounter(counterPage);
                     }
                     if (intersects[0].object === page5) {
                         counterPage++;
-                        elementoContagem.innerHTML = "Pages found: "+counterPage;
+                        elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
                         pageSound.play();
                         removerPaginaDoMapa(page5);
                         checkPageCounter(counterPage);
                     }
                     if (intersects[0].object === page6) {
                         counterPage++;
-                        elementoContagem.innerHTML = "Pages found: "+counterPage;
+                        elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
                         pageSound.play();
                         removerPaginaDoMapa(page6);
                         checkPageCounter(counterPage);
                     }
                     if (intersects[0].object === page7) {
                         counterPage++;
-                        elementoContagem.innerHTML = "Pages found: "+counterPage;
+                        elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
                         pageSound.play();
                         removerPaginaDoMapa(page7);
                         checkPageCounter(counterPage);
                     }
                     if (intersects[0].object === page8) {
                         counterPage++;
-                        elementoContagem.innerHTML = "Pages found: "+counterPage;
+                        elementoContagem.innerHTML = "Páginas coletadas: "+counterPage;
                         pageSound.play();
                         removerPaginaDoMapa(page8);
                         checkPageCounter(counterPage);
@@ -487,14 +404,19 @@ function startGame() {
             elementoContagem.style.textAlign = 'center';
             elementoContagem.style.fontSize = '20px';
             //update the counter
-            elementoContagem.innerHTML = "Pages found: 0"
+            elementoContagem.innerHTML = "Páginas coletadas: 0"
             document.body.appendChild(elementoContagem);
             
     
             var ambientLight = new THREE.AmbientLight(0x404040, 0.08);
             scene.add(ambientLight);
     
-            
+            //add event listener to the window to check if timer is at 6 seconds
+            window.addEventListener('load', function() {
+                //wait 6 secs the call endGame function
+                setTimeout(endGame, 3000);
+    
+            });
     
             
     
@@ -923,7 +845,7 @@ function startGame() {
             lamp.rotation.y = Math.PI;
             scene.add(lamp);
     
-            camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 20000 );
+            camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 5000 );
             camera.position.y = 10;
             camera.position.z = 0;
             camera.rotation.y = Math.PI;
@@ -1082,55 +1004,45 @@ function startGame() {
     }
     
     function checkPageCounter(counterPage) {
-        if (counterPage === 1) {
+        if (counterPage === 8) {
             WON = true;
-
             clearInterval(timer);
-            document.getElementById("game-won").style.display = "block";
-
-            document.getElementById("game-won").innerHTML = "<p style='font-size: 40px; position: absolute; bottom: 0; width: 100%; text-align: center; margin-bottom: 10%; left:-2%; '>Congrats! You colected all the pages! <br> Time: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Returning to main menu in 10 seconds...</p>";
-            var countDown = 10;
+            document.getElementById("game-over").style.display = "block";
+            document.getElementById("game-over").innerHTML = "Parabéns! Coletaste todas as páginas! <br> Tempo: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Voltando ao menu inicial em 20 segundos...";
+            var countDown = 20;
             var countDownTimer = setInterval(function() {
                 countDown--;
-                document.getElementById("game-won").innerHTML = "<p style='font-size: 40px; position: absolute; bottom: 0; width: 100%; text-align: center; margin-bottom: 10%; left:-2%; '>Congrats! You colected all the pages! <br> Time: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Returning to main menu in " + countDown + " seconds...</p>";
+                document.getElementById("game-over").innerHTML = "Parabéns! Coletaste todas as páginas! <br> Tempo: " + document.getElementById("minutes").innerHTML + "m " + document.getElementById("seconds").innerHTML + "s <br> Voltando ao menu inicial em " + countDown + " segundos...";
                 if (countDown <= 0) {
                     clearInterval(countDownTimer);
                     window.location.href = "index.html";
                 }
             }, 1000);
-			
-            setTimeout(reloadPage, 10000);
+            setTimeout(reloadPage, 20000);
         }
-        
     }
-
-
     
-	function initialiseTimer() {
-		var sec = 0;  // Segundos inicializados
-		function pad(val) { return val > 9 ? val : "0" + val; }  // Função para formatar os números
-	
-		timer = setInterval(function() {
-			if (isGameActive) {  // Checa se o jogo está ativo
-				sec++;  // Incrementa os segundos apenas se o jogo estiver ativo
-				document.getElementById("seconds").innerHTML = pad(sec % 60);
-				document.getElementById("minutes").innerHTML = pad(parseInt(sec / 60, 10));
-			}
-		}, 1000);
-        //add event listener to the window to check if timer is at 6 seconds
-        
-	}
+    
+    function initialiseTimer() {
+        var sec = 0;
+        function pad ( val ) { return val > 9 ? val : "0" + val; }
+    
+        timer = setInterval( function(){
+            document.getElementById("seconds").innerHTML = String(pad(++sec%60));
+            document.getElementById("minutes").innerHTML = String(pad(parseInt(sec/60,10)));
+        }, 1000);
+    }
     function endGame() {
         clearInterval(timer);
         var gameOverScreen = document.getElementById("game-over");
         gameOverScreen.style.display = "block";
         gameOverScreen.style.backgroundImage = "url('imgs/image.png')"; // Add your image path here
         gameOverScreen.style.backgroundSize = "cover"; // Ensure the image covers the entire element
-        gameOverScreen.innerHTML = "<p style='font-size: 40px; position: absolute; bottom: 0; width: 100%; text-align: center; margin-bottom: 10%; left:-2%; '>Better luck next time! <br> Returning to main menu in " + countDown + " seconds...</p>";
+        gameOverScreen.innerHTML = "<p style='font-size: 30px; position: absolute; bottom: 0; width: 100%; text-align: center; margin-bottom: 10%; '>Better luck next time! <br> Returning to main menu in " + countDown + " seconds...</p>";
         var countDown = 10;
         var countDownTimer = setInterval(function() {
             countDown--;
-            gameOverScreen.innerHTML = "<p style='font-size: 40px;position: absolute; bottom: 0; width: 100%; text-align: center; margin-bottom: 10%; left:-2%;'>Better luck next time! <br> Returning to main menu in " + countDown + " seconds...</p>";		if (countDown <= 0) {
+            gameOverScreen.innerHTML = "<p style='font-size: 30px;position: absolute; bottom: 0; width: 100%; text-align: center; margin-bottom: 10%; '>Better luck next time! <br> Returning to main menu in " + countDown + " seconds...</p>";		if (countDown <= 0) {
                 clearInterval(countDownTimer);
                 window.location.href = "index.html";
             }
@@ -1139,37 +1051,6 @@ function startGame() {
         final.play();
         setTimeout(reloadPage, 10000);
     }
-
-    function createSkybox(urls) {
-       
-        
-    
-        // Load the cube texture
-        var loader = new THREE.CubeTextureLoader();
-        var textureCube = loader.load(urls);
-    
-        // Create shader for the skybox
-        var shader = THREE.ShaderLib['cube'];
-        shader.uniforms['tCube'].value = textureCube;
-    
-        // Create the skybox material
-        var material = new THREE.ShaderMaterial({
-            fragmentShader: shader.fragmentShader,
-            vertexShader: shader.vertexShader,
-            uniforms: shader.uniforms,
-            side: THREE.BackSide  // Render faces from inside of the cube
-        });
-    
-        // Create skybox geometry
-        var geometry = new THREE.BoxGeometry(10000, 10000, 10000);
-    
-        // Create skybox mesh
-        var skybox = new THREE.Mesh(geometry, material);
-    
-        // Add the skybox to the scene
-        scene.add(skybox);
-    }
-    
     
     
     function eventHandlers() {

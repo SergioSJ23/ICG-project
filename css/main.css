@@ -76,8 +76,9 @@ body {
 
 	width: 100%;
 	height: 100%;
-
-	background-color: rgba(0,0,0,0.80);
+    background: url("../imgs/background.jpg") no-repeat center center ;
+    background-size: cover;
+	background-color: rgba(0,0,0);
 
 }
 
@@ -286,28 +287,73 @@ body {
     margin-top: 20px;
 }
 
+
 #game-over {
     position: fixed;
-    top: 50%;
+    top:50%;
+    width: 100%;
+    height: 100%;
     left: 50%;
+
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
+    
     color: white;
     padding: 20px;
     border-radius: 10px;
     display: none; /* Inicialmente oculto */
     z-index: 9999; /* Para garantir que esteja na parte superior */
+    
+}
+#game-over p {
+    font-family: 'MyFont', cursive; /* This applies Creepster to the text in your game-over paragraph */
+    font-size: 40px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
 }
 
-#game-lose {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    display: none; /* Inicialmente oculto */
-    z-index: 9999; /* Para garantir que esteja na parte superior */
+#game-won {
+    position: fixed;       /* Use fixed positioning */
+    top: 50%;              /* Center vertically */
+    left: 50%; 
+    height:100%;            /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust position to exact center */
+    width: 100%;           /* Take full width to center text properly */
+    text-align: center;    /* Ensure text is centered */
+    display: none;         /* Start with element hidden */
+    z-index: 1000;         /* Make sure it's above other content */
+    color: white;          /* Optional: Change text color */
+    background: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+    padding: 20px;         /* Padding for aesthetic spacing */
+    box-sizing: border-box; /* Handle box-sizing while using padding */
+    font-size: 24px;       /* Optional: Adjust font size */
 }
+
+#game-won p {
+    top: 20%;
+    font-family: 'MyFont2', cursive; /* This applies Creepster to the text in your game-won heading */
+    font-size: 40px;       /* Optional: Adjust font size */
+}
+
+
+
+@font-face {
+    font-family: 'MyFont'; /* A name to use later when referencing the font */
+    src: url('../fonts/Un.ttf') format('truetype'); /* Path to the font file and format */
+    font-weight: normal; /* You can define different weights if multiple files are provided */
+    font-style: normal; /* Same as above, for style */
+}
+@font-face {
+    font-family: 'MyFont2'; /* A name to use later when referencing the font */
+    src: url('../fonts/Un2.ttf') format('truetype'); /* Path to the font file and format */
+    font-weight: normal; /* You can define different weights if multiple files are provided */
+    font-style: normal; /* Same as above, for style */
+}
+@font-face {
+    font-family: 'Win'; /* A name to use later when referencing the font */
+    src: url('../fonts/win.ttf') format('truetype'); /* Path to the font file and format */
+    font-weight: normal; /* You can define different weights if multiple files are provided */
+    font-style: normal; /* Same as above, for style */
+}
+
