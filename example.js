@@ -28,9 +28,9 @@ function startGame() {
             screamSound.volume = 1.0;
             setInterval(function() {
                 screamSound.play();
-            }, 90000);
+            }, 120000);
     
-            ambientSound.volume = 0.2;
+            ambientSound.volume = 0.1;
             final.volume = 0.8;
 
 			document.addEventListener('click', function activateGame() {
@@ -401,7 +401,7 @@ slenderMan.scale.set(1.5,1.5,1.5);
 
 
             //weak ambient light
-            var ambientLight = new THREE.AmbientLight(0xB0B0B0, 0.5);
+            var ambientLight = new THREE.AmbientLight(0xB0B0B0, 1);
             scene.add(ambientLight);
     
             var page = addPageToScene(2040,10, 2455, "imgs/page1.webp");
