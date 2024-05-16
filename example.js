@@ -923,7 +923,7 @@ function startGame() {
             lamp.rotation.y = Math.PI;
             scene.add(lamp);
     
-            camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 20000 );
+            camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 8000 );
             camera.position.y = 10;
             camera.position.z = 0;
             camera.rotation.y = Math.PI;
