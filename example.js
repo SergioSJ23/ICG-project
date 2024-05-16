@@ -30,7 +30,7 @@ function startGame() {
                 screamSound.play();
             }, 90000);
     
-            ambientSound.volume = 0.3;
+            ambientSound.volume = 0.2;
             final.volume = 0.8;
 
 			document.addEventListener('click', function activateGame() {
@@ -328,7 +328,7 @@ const headMaterial = new THREE.MeshPhongMaterial({
 });
 
 const head = new THREE.Mesh(headGeometry, headMaterial);
-head.position.set(0, 22.5, 0); // Adjust position to connect with body
+head.position.set(0, 20, 0); // Adjust position to connect with body
 head.scale.set(1.5, 1.5, 1.5);
 head.rotation.y = Math.PI / 2; // Rotate head to face the correct direction
 
@@ -377,6 +377,7 @@ rightArm.scale.set(1, 1.5, 1);
 leftLeg.scale.set(1, 1.5, 1);
 rightLeg.scale.set(1, 1.5, 1);
 
+
 // Group all parts together
 const slenderMan = new THREE.Group();
 slenderMan.add(head);
@@ -385,6 +386,8 @@ slenderMan.add(leftArm);
 slenderMan.add(rightArm);
 slenderMan.add(leftLeg);
 slenderMan.add(rightLeg);
+
+slenderMan.scale.set(1.5,1.5,1.5);
 
 // Adjust the overall position for the entire model
  // Position the entire group in the scene
@@ -398,11 +401,12 @@ slenderMan.add(rightLeg);
 
 
             //weak ambient light
-            var ambientLight = new THREE.AmbientLight(0x404040, 0.051);
+            var ambientLight = new THREE.AmbientLight(0xB0B0B0, 0.5);
             scene.add(ambientLight);
     
-            var page = addPageToScene(2040,20, 2455, "imgs/page1.webp");
+            var page = addPageToScene(2040,10, 2455, "imgs/page1.webp");
             page.rotation.y = Math.PI/2;
+            page.scale.set(0.5, 0.5, 0.5);
             var page2 = addPageToScene(-1895, 10, -2079, "imgs/page2.webp");
             var page3 = addPageToScene(-2070, 420, -2105, "imgs/page3.jpeg");
             var page4 = addPageToScene(0, 10, -490,"imgs/page4.jpg");
@@ -449,7 +453,7 @@ slenderMan.add(rightLeg);
                         setTimeout(checkPageCounter, 1000);
                         video.play();
                         scream.play();
-                        slenderMan.position.set(-2070, 420, -1915);
+                        slenderMan.position.set(2400, 0, 2457);
                         
                         scene.add(slenderMan);
                         setTimeout(function() {
@@ -481,9 +485,11 @@ slenderMan.add(rightLeg);
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
-                        slenderMan.position.set(-2070, 420, -1915);
+                        slenderMan.rotation.y = Math.PI;
+                        slenderMan.position.set(-5, 0, -320);
                         
                         scene.add(slenderMan);
+                        slenderMan.rotation.y = -Math.PI;
                         setTimeout(function() {
                             scene.remove(slenderMan);
                         }, 5000);
@@ -494,9 +500,7 @@ slenderMan.add(rightLeg);
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
-                        slenderMan.position.set(-2070, 420, -1915);
                         
-                        scene.add(slenderMan);
                         setTimeout(function() {
                             scene.remove(slenderMan);
                         }, 5000);
@@ -507,7 +511,7 @@ slenderMan.add(rightLeg);
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
-                        slenderMan.position.set(-2070, 420, -1915);
+                        slenderMan.position.set(-1760, 0, -1930);
                         
                         scene.add(slenderMan);
                         setTimeout(function() {
@@ -1115,6 +1119,7 @@ slenderMan.add(rightLeg);
             page.position.set(x, y, z); // Adjust position as needed
     
             // Add the page to the scene
+            
             scene.add(page);
         
             // Add the page to the objects array for collision detection
