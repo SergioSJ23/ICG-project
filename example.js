@@ -305,65 +305,96 @@ function startGame() {
             scene.add(videoScreen);
     
     
-            const textureLoader = new THREE.TextureLoader();
-            const colorMap = textureLoader.load('imgs/head.png');
-            const bumpMap = textureLoader.load('imgs/head.png');
-            
-            // Create head geometry and material
-            const headGeometry = new THREE.SphereGeometry(2.5, 100, 100);
-            headGeometry.scale(0.8, 1.0, 0.7); // Adjust head shape
-            const headMaterial = new THREE.MeshPhongMaterial({
-                color: 0xffffff,
-                map: colorMap,
-                bumpMap: bumpMap,
-                bumpScale: 0.00001,
-                reflectivity: 0.1,
-                shininess: 0
-            });
-            const head = new THREE.Mesh(headGeometry, headMaterial);
-            
-            // Create body geometry and material
-            const bodyGeometry = new THREE.BoxGeometry(4, 15, 3);
-            const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-            
-            // Create arms
-            const armGeometry = new THREE.BoxGeometry(0.75, 15, 0.75);
-            const leftArm = new THREE.Mesh(armGeometry, bodyMaterial);
-            const rightArm = new THREE.Mesh(armGeometry, bodyMaterial);
-            leftArm.position.set(-3, 0, 0); // Position relative to body center
-            rightArm.position.set(3, 0, 0);
-            
-            // Create legs
-            const legGeometry = new THREE.BoxGeometry(1.5, 20, 1.5);
-            const leftLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-            const rightLeg = new THREE.Mesh(legGeometry, bodyMaterial);
-            leftLeg.position.set(-1, -10, 0); // Position relative to body center
-            rightLeg.position.set(1, -10, 0);
-            
-            // Group all parts together
-            const slenderMan = new THREE.Group();
-            slenderMan.add(head);
-            slenderMan.add(body);
-            slenderMan.add(leftArm);
-            slenderMan.add(rightArm);
-            slenderMan.add(leftLeg);
-            slenderMan.add(rightLeg);
-            
-            // Adjust positions relative to the group center
-            head.position.set(0, 27.5, 0);
-            head.scale.set(1.5, 1.5, 1.5);
-            head.rotation.y = Math.PI / 2;
-            body.position.set(0, 7.5, 0);
-            
-            // Adjust the scale for the entire model
-            slenderMan.scale.set(2, 2, 2);
-            slenderMan.position.set(0, 100, 0);
-            
-            // Add the group to the scene
-            scene.add(slenderMan);
-            
-            
+// Load textures
+const textureLoader = new THREE.TextureLoader();
+const headTexture = textureLoader.load('imgs/head.png');
+const bodyTexture = textureLoader.load('imgs/black.png'); // Assuming you have a body texture
+
+// Set the texture wrapping to clamp
+bodyTexture.wrapS = THREE.ClampToEdgeWrapping;
+bodyTexture.wrapT = THREE.ClampToEdgeWrapping;
+
+// Create head geometry and material
+const headGeometry = new THREE.SphereGeometry(2, 100, 100);
+headGeometry.scale(0.8, 1.0, 0.7); // Adjust head shape
+
+const headMaterial = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    map: headTexture,
+    bumpMap: headTexture,
+    bumpScale: 0.01, // Adjusted bump scale for better visibility
+    reflectivity: 0.1,
+    shininess: 0
+});
+
+const head = new THREE.Mesh(headGeometry, headMaterial);
+head.position.set(0, 22.5, 0); // Adjust position to connect with body
+head.scale.set(1.5, 1.5, 1.5);
+head.rotation.y = Math.PI / 2; // Rotate head to face the correct direction
+
+// Create body geometry and material
+const bodyGeometry = new THREE.BoxGeometry(4, 15, 3);
+
+const bodyMaterial = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    map: bodyTexture,
+    bumpMap: bodyTexture,
+    bumpScale: 0.01,
+    reflectivity: 0.1,
+    shininess: 0
+});
+
+const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+body.position.set(0, 10, 0); // Center the body
+body.scale.set(1, 1.1, 1); // Scale the body in y-axis by 1.5
+
+// Create arms and legs geometries and materials
+const armLegMaterial = new THREE.MeshPhongMaterial({
+    color: 0x000000,
+    map: bodyTexture, // Use body texture for arms and legs
+    bumpMap: bodyTexture,
+    bumpScale: 0.01,
+    reflectivity: 0.1,
+    shininess: 0
+});
+
+const armGeometry = new THREE.BoxGeometry(1, 15, 0.75);
+const legGeometry = new THREE.BoxGeometry(1, 20, 1.5);
+
+const leftArm = new THREE.Mesh(armGeometry, armLegMaterial);
+const rightArm = new THREE.Mesh(armGeometry, armLegMaterial);
+const leftLeg = new THREE.Mesh(legGeometry, armLegMaterial);
+const rightLeg = new THREE.Mesh(legGeometry, armLegMaterial);
+
+leftArm.position.set(-3, 7, 0); // Position relative to body center and adjusted for connection
+rightArm.position.set(3, 7, 0);
+leftLeg.position.set(-1.25, -2.5, 0); // Position relative to body center and adjusted for connection
+rightLeg.position.set(1.25, -2.5, 0);
+
+// Scale arms and legs in y-axis by 1.5
+leftArm.scale.set(1, 1.5, 1);
+rightArm.scale.set(1, 1.5, 1);
+leftLeg.scale.set(1, 1.5, 1);
+rightLeg.scale.set(1, 1.5, 1);
+
+// Group all parts together
+const slenderMan = new THREE.Group();
+slenderMan.add(head);
+slenderMan.add(body);
+slenderMan.add(leftArm);
+slenderMan.add(rightArm);
+slenderMan.add(leftLeg);
+slenderMan.add(rightLeg);
+
+// Adjust the overall position for the entire model
+ // Position the entire group in the scene
+
+
+
+
+// Add the group to the scene
+
+
 
 
             //weak ambient light
@@ -418,6 +449,12 @@ function startGame() {
                         setTimeout(checkPageCounter, 1000);
                         video.play();
                         scream.play();
+                        slenderMan.position.set(-2070, 420, -1915);
+                        
+                        scene.add(slenderMan);
+                        setTimeout(function() {
+                            scene.remove(slenderMan);
+                        }, 5000);
                         checkPageCounter(counterPage);
                     }
                     if (intersects[0].object === page2) {
@@ -431,6 +468,12 @@ function startGame() {
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
+                        slenderMan.position.set(-2070, 420, -1915);
+                        
+                        scene.add(slenderMan);
+                        setTimeout(function() {
+                            scene.remove(slenderMan);
+                        }, 5000);
                         removerPaginaDoMapa(page3);
                         checkPageCounter(counterPage);
                     }
@@ -438,6 +481,12 @@ function startGame() {
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
+                        slenderMan.position.set(-2070, 420, -1915);
+                        
+                        scene.add(slenderMan);
+                        setTimeout(function() {
+                            scene.remove(slenderMan);
+                        }, 5000);
                         removerPaginaDoMapa(page4);
                         checkPageCounter(counterPage);
                     }
@@ -445,6 +494,12 @@ function startGame() {
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
+                        slenderMan.position.set(-2070, 420, -1915);
+                        
+                        scene.add(slenderMan);
+                        setTimeout(function() {
+                            scene.remove(slenderMan);
+                        }, 5000);
                         removerPaginaDoMapa(page5);
                         checkPageCounter(counterPage);
                     }
@@ -452,6 +507,12 @@ function startGame() {
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
+                        slenderMan.position.set(-2070, 420, -1915);
+                        
+                        scene.add(slenderMan);
+                        setTimeout(function() {
+                            scene.remove(slenderMan);
+                        }, 5000);
                         removerPaginaDoMapa(page6);
                         checkPageCounter(counterPage);
                     }
@@ -459,6 +520,12 @@ function startGame() {
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
+                        slenderMan.position.set(-2070, 420, -1915);
+                        
+                        scene.add(slenderMan);
+                        setTimeout(function() {
+                            scene.remove(slenderMan);
+                        }, 5000);
                         removerPaginaDoMapa(page7);
                         checkPageCounter(counterPage);
                     }
@@ -466,6 +533,12 @@ function startGame() {
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
+                        slenderMan.position.set(-2070, 420, -1915);
+                        
+                        scene.add(slenderMan);
+                        setTimeout(function() {
+                            scene.remove(slenderMan);
+                        }, 5000);
                         removerPaginaDoMapa(page8);
                         checkPageCounter(counterPage);
                     }
@@ -1082,7 +1155,7 @@ function startGame() {
     }
     
     function checkPageCounter(counterPage) {
-        if (counterPage === 1) {
+        if (counterPage === 8) {
             WON = true;
 
             clearInterval(timer);
@@ -1103,8 +1176,6 @@ function startGame() {
         }
         
     }
-
-
     
 	function initialiseTimer() {
 		var sec = 0;  // Segundos inicializados
