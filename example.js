@@ -756,7 +756,7 @@ slenderMan.scale.set(1.5,1.5,1.5);
             // Ajustar a posição da escada e do conjunto torre de vigia
             //ROTATE 180 ON Y WITHOUT CHANGING PLACE
             stairs.rotation.y = Math.PI;
-            stairs.position.set(-totalStepsPerSide * stepWidth / 2-1720, 0, -totalStepsPerSide * stepDepth / 2-1760);
+            stairs.position.set(-totalStepsPerSide * stepWidth / 2-1720, -5, -totalStepsPerSide * stepDepth / 2-1760);
     
             // Adicionar a torre de vigia à lista de objetos para interações futuras
             objects.push(stairs);
@@ -1004,7 +1004,7 @@ slenderMan.scale.set(1.5,1.5,1.5);
             scene.add(lamp);
     
             camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 1, 8000 );
-            camera.position.y = 10;
+            camera.position.y = 20;
             camera.position.z = 0;
             camera.rotation.y = Math.PI;
     
