@@ -30,7 +30,7 @@ function startGame() {
                 screamSound.play();
             }, 90000);
     
-            ambientSound.volume = 0.2;
+            ambientSound.volume = 0.1;
             final.volume = 0.8;
 
 			document.addEventListener('click', function activateGame() {
@@ -330,10 +330,10 @@ const headMaterial = new THREE.MeshPhongMaterial({
 const head = new THREE.Mesh(headGeometry, headMaterial);
 head.position.set(0, 20, 0); // Adjust position to connect with body
 head.scale.set(1.5, 1.5, 1.5);
-head.rotation.y = Math.PI / 2; // Rotate head to face the correct direction
+head.rotation.y = Math.PI / 2 + Math.PI/10; // Rotate head to face the correct direction
 
 // Create body geometry and material
-const bodyGeometry = new THREE.BoxGeometry(4, 15, 3);
+const bodyGeometry = new THREE.BoxGeometry(4, 13, 3);
 
 const bodyMaterial = new THREE.MeshPhongMaterial({
     color: 0xffffff,
@@ -345,7 +345,7 @@ const bodyMaterial = new THREE.MeshPhongMaterial({
 });
 
 const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-body.position.set(0, 10, 0); // Center the body
+body.position.set(0, 11, 0); // Center the body
 body.scale.set(1, 1.1, 1); // Scale the body in y-axis by 1.5
 
 // Create arms and legs geometries and materials
@@ -366,8 +366,8 @@ const rightArm = new THREE.Mesh(armGeometry, armLegMaterial);
 const leftLeg = new THREE.Mesh(legGeometry, armLegMaterial);
 const rightLeg = new THREE.Mesh(legGeometry, armLegMaterial);
 
-leftArm.position.set(-3, 7, 0); // Position relative to body center and adjusted for connection
-rightArm.position.set(3, 7, 0);
+leftArm.position.set(-2.7, 6.5, 0); // Position relative to body center and adjusted for connection
+rightArm.position.set(2.7, 6.5, 0);
 leftLeg.position.set(-1.25, -2.5, 0); // Position relative to body center and adjusted for connection
 rightLeg.position.set(1.25, -2.5, 0);
 
@@ -389,6 +389,8 @@ slenderMan.add(rightLeg);
 
 slenderMan.scale.set(1.5,1.5,1.5);
 
+
+
 // Adjust the overall position for the entire model
  // Position the entire group in the scene
 
@@ -401,14 +403,14 @@ slenderMan.scale.set(1.5,1.5,1.5);
 
 
             //weak ambient light
-            var ambientLight = new THREE.AmbientLight(0xB0B0B0, 0.5);
+            var ambientLight = new THREE.AmbientLight(0xB0B0B0, 0.2);
             scene.add(ambientLight);
     
-            var page = addPageToScene(2040,10, 2455, "imgs/page1.webp");
+            var page = addPageToScene(2045,18, 2450, "imgs/page1.webp");
             page.rotation.y = Math.PI/2;
             page.scale.set(0.5, 0.5, 0.5);
             var page2 = addPageToScene(-1895, 10, -2079, "imgs/page2.webp");
-            var page3 = addPageToScene(-2070, 420, -2105, "imgs/page3.jpeg");
+            var page3 = addPageToScene(-2070, 420, -2103, "imgs/page3.jpeg");
             var page4 = addPageToScene(0, 10, -490,"imgs/page4.jpg");
             var page5 = addPageToScene(1500, 10, -1498,"imgs/page5.webp");
             var page6 = addPageToScene(-1784, 10, 2039,"imgs/page6.jpg");
@@ -454,11 +456,12 @@ slenderMan.scale.set(1.5,1.5,1.5);
                         video.play();
                         scream.play();
                         slenderMan.position.set(2400, 0, 2457);
+                        slenderMan.rotation.y = Math.PI/2;
                         
                         scene.add(slenderMan);
                         setTimeout(function() {
                             scene.remove(slenderMan);
-                        }, 5000);
+                        }, 10000);
                         checkPageCounter(counterPage);
                     }
                     if (intersects[0].object === page2) {
@@ -472,12 +475,12 @@ slenderMan.scale.set(1.5,1.5,1.5);
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
-                        slenderMan.position.set(-2070, 420, -1915);
+                        slenderMan.position.set(-2050, 420, -1915);
                         
                         scene.add(slenderMan);
                         setTimeout(function() {
                             scene.remove(slenderMan);
-                        }, 5000);
+                        }, 10000);
                         removerPaginaDoMapa(page3);
                         checkPageCounter(counterPage);
                     }
@@ -485,14 +488,14 @@ slenderMan.scale.set(1.5,1.5,1.5);
                         counterPage++;
                         elementoContagem.innerHTML = "Pages found: "+counterPage;
                         pageSound.play();
-                        slenderMan.rotation.y = Math.PI;
+                        
                         slenderMan.position.set(-5, 0, -320);
                         
                         scene.add(slenderMan);
-                        slenderMan.rotation.y = -Math.PI;
+                        
                         setTimeout(function() {
                             scene.remove(slenderMan);
-                        }, 5000);
+                        }, 10000);
                         removerPaginaDoMapa(page4);
                         checkPageCounter(counterPage);
                     }
@@ -503,7 +506,7 @@ slenderMan.scale.set(1.5,1.5,1.5);
                         
                         setTimeout(function() {
                             scene.remove(slenderMan);
-                        }, 5000);
+                        }, 10000);
                         removerPaginaDoMapa(page5);
                         checkPageCounter(counterPage);
                     }
@@ -529,7 +532,7 @@ slenderMan.scale.set(1.5,1.5,1.5);
                         scene.add(slenderMan);
                         setTimeout(function() {
                             scene.remove(slenderMan);
-                        }, 5000);
+                        }, 10000);
                         removerPaginaDoMapa(page7);
                         checkPageCounter(counterPage);
                     }
